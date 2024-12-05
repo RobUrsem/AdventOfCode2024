@@ -15,18 +15,11 @@ func main() {
 		log.Fatalf("Error reading [%v]: %v", filePath, err)
 	}
 
-	total := 0
+	var ops []operations.Operation
 	for _, dump := range memory {
-		ops, err := operations.FindOperations(dump)
-
-		if err != nil {
-			fmt.Printf("Fatal error finding operations: %v\n", err)
-			break
-		}
-		for _, operation := range ops {
-			total += operations.Execute(operation)
-		}
+		ops = append(ops, operations.FindOperations(dump)...)
 	}
+	total := operations.ExecuteOperations(ops)
 
 	fmt.Printf("Total from the operations: %v\n", total)
 }

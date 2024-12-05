@@ -4,17 +4,18 @@ import (
 	"fmt"
 	"regexp"
 	"strconv"
+	"strings"
 )
 
-func handleMultiplication(match []string) (Operation, error) {
-	a, err := strconv.Atoi(match[1])
+func handleMultiplication(str_a string, str_b string) (Operation, error) {
+	a, err := strconv.Atoi(str_a)
 	if err != nil {
-		return Operation{}, fmt.Errorf("%v: can't convert [%v] to int: %v\n", match[0], match[1], err)
+		return Operation{}, fmt.Errorf("can't convert [%v] to int: %v", str_a, err)
 	}
 
-	b, err := strconv.Atoi(match[2])
+	b, err := strconv.Atoi(str_b)
 	if err != nil {
-		return Operation{}, fmt.E("%v: can't convert [%v] to int: %v\n", match[0], match[2], err)
+		return Operation{}, fmt.Errorf("can't convert [%v] to int: %v", str_b, err)
 	}
 
 	return Operation{
@@ -23,22 +24,22 @@ func handleMultiplication(match []string) (Operation, error) {
 	}, nil
 }
 
-func handleEnable(match []string) (Operation, error) {
+func handleEnable() (Operation, error) {
 	return Operation{
-		Params:        []int{},
-		OperationType: On,
+		Params:        nil,
+		OperationType: Enable,
 	}, nil
 }
 
-func handleDisable(match []string) (Operation, error) {
+func handleDisable() (Operation, error) {
 	return Operation{
-		Params:        []int{},
-		OperationType: Off,
+		Params:        nil,
+		OperationType: Disable,
 	}, nil
 }
 
-func findMultiplications(text string) []Operation {
-	pattern := `(mul)\((\d{1,3}),(\d{1,3})\)|(do)\(\)|(don't)\(\)`
+func FindOperations(text string) []Operation {
+	pattern := `mul\((\d{1,3}),(\d{1,3})\)|do\(\)|don't\(\)`
 
 	rx, err := regexp.Compile(pattern)
 	if err != nil {
@@ -46,34 +47,25 @@ func findMultiplications(text string) []Operation {
 		return nil
 	}
 
-	ignoreOperation := false
 	operations := []Operation{}
+	op := Operation{}
+
 	matches := rx.FindAllStringSubmatch(text, -1)
 	for _, match := range matches {
-		if ignoreOperation {
-			continue
+		operatorType := match[0]
+		switch {
+		case strings.HasPrefix(operatorType, "mul("):
+			op, err = handleMultiplication(match[1], match[2])
+		case strings.HasPrefix(operatorType, "do("):
+			op, err = handleEnable()
+		case strings.HasPrefix(operatorType, "don't("):
+			op, err = handleDisable()
 		}
 
-		op := Operation{}
-
-		switch match[0] {
-		case "mul":
-			op, err = handleMultiplication(match)
-		case "do":
-			op, err = handleEnable(match)
-		case "don't":
-			op, err = handleDisable(match)
-		}
-
-		if err != nil {
+		if err == nil {
 			operations = append(operations, op)
 		}
 	}
 
 	return operations
-}
-
-func FindOperations(text string) ([]Operation, error) {
-	operations := findMultiplications(text)
-	return operations, nil
 }

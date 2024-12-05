@@ -3,8 +3,8 @@ package operations
 const (
 	None = iota
 	Multiply
-	On
-	Off
+	Enable
+	Disable
 )
 
 type Operation struct {

@@ -13,7 +13,7 @@ func TestExecuteOperations(t *testing.T) {
 			input: []Operation{
 				{Params: []int{2, 3}, OperationType: Multiply},
 			},
-			expected: 6,
+			expected: 2 * 3,
 		},
 		{
 			name: "mul(2,3);mul(44,46)",
@@ -21,14 +21,14 @@ func TestExecuteOperations(t *testing.T) {
 				{Params: []int{2, 3}, OperationType: Multiply},
 				{Params: []int{44, 46}, OperationType: Multiply},
 			},
-			expected: 2030,
+			expected: 2*3 + 44*46,
 		},
 		{
 			name: "mul(123,456)",
 			input: []Operation{
 				{Params: []int{123, 456}, OperationType: Multiply},
 			},
-			expected: 56088,
+			expected: 123 * 456,
 		},
 		{
 			name: "large example",
@@ -38,16 +38,39 @@ func TestExecuteOperations(t *testing.T) {
 				{Params: []int{11, 8}, OperationType: Multiply},
 				{Params: []int{8, 5}, OperationType: Multiply},
 			},
-			expected: 161,
+			expected: 2*4 + 5*5 + 11*8 + 8*5,
+		},
+		{
+			name: "with disable and enable",
+			input: []Operation{
+				{Params: []int{2, 4}, OperationType: Multiply},
+				{Params: nil, OperationType: Disable},
+				{Params: []int{5, 5}, OperationType: Multiply},
+				{Params: []int{11, 8}, OperationType: Multiply},
+				{Params: nil, OperationType: Enable},
+				{Params: []int{8, 5}, OperationType: Multiply},
+			},
+			expected: 2*4 + 8*5,
+		},
+		{
+			name: "with multiple disables and enable",
+			input: []Operation{
+				{Params: []int{2, 4}, OperationType: Multiply},
+				{Params: nil, OperationType: Disable},
+				{Params: nil, OperationType: Disable},
+				{Params: []int{5, 5}, OperationType: Multiply},
+				{Params: nil, OperationType: Enable},
+				{Params: []int{11, 8}, OperationType: Multiply},
+				{Params: nil, OperationType: Enable},
+				{Params: []int{8, 5}, OperationType: Multiply},
+			},
+			expected: 2*4 + 11*8 + 8*5,
 		},
 	}
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			total := 0
-			for _, op := range tc.input {
-				total += Execute(op)
-			}
+			total := ExecuteOperations(tc.input)
 
 			if total != tc.expected {
 				t.Errorf("%v: expected %v but got %v", tc.name, tc.expected, total)
