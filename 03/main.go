@@ -1,7 +1,8 @@
 package main
 
 import (
-	"03/operations"
+	"advent/03/operations"
+	"advent/shared"
 	"fmt"
 	"log"
 	"path/filepath"
@@ -10,7 +11,7 @@ import (
 func main() {
 	filePath := filepath.Join("data", "input.txt")
 
-	memory, err := operations.ReadInput(filePath)
+	memory, err := shared.ReadInput(filePath)
 	if err != nil {
 		log.Fatalf("Error reading [%v]: %v", filePath, err)
 	}
