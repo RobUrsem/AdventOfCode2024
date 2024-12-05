@@ -37,7 +37,14 @@ func TestFindOperations(t *testing.T) {
 				{Params: []int{5, 5}, OperationType: Multiply},
 				{Params: []int{11, 8}, OperationType: Multiply},
 				{Params: []int{8, 5}, OperationType: Multiply},
-			}},
+			},
+		},
+		{"xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))",
+			[]Operation{
+				{Params: []int{2, 4}, OperationType: Multiply},
+				{Params: []int{8, 5}, OperationType: Multiply},
+			},
+		},
 	}
 
 	for _, tc := range testCases {
