@@ -73,76 +73,68 @@ func searchVertical(needle string, haystack []string) int {
 	return count
 }
 
+type BoundaryData struct {
+	Start, Step, Stop int
+}
+type SearchData struct {
+	row, col BoundaryData
+}
+
+func searchDirection(data SearchData, needle string, haystack []string) int {
+	needleLength := len(needle)
+
+	count := 0
+
+	for r := data.row.Start; r != data.row.Stop; r += data.row.Step {
+		for c := data.col.Start; c != data.col.Stop; c += data.col.Step {
+			numMatches := 0
+			for offset := 0; offset < needleLength; offset++ {
+				row := r + offset*data.row.Step
+				col := c + offset*data.col.Step
+				if haystack[row][col] == needle[numMatches] {
+					numMatches++
+					if numMatches == needleLength {
+						count++
+						break
+					}
+				} else {
+					break
+				}
+			}
+		}
+	}
+
+	return count
+}
+
 func searchDiagonal(needle string, haystack []string) int {
 	numRows := len(haystack)
 	numColumns := len(haystack[0])
 	needleLength := len(needle)
 
-	count := 0
-
 	//--- Downward NW-SE
-	for r := 0; r <= numRows-needleLength; r++ {
-		for c := 0; c <= numColumns-needleLength; c++ {
-			numMatches := 0
-			for offset := 0; offset < needleLength; offset++ {
-				if haystack[r+offset][c+offset] == byte(needle[numMatches]) {
-					numMatches++
-					if numMatches == needleLength {
-						count++
-						numMatches = 0
-					}
-				}
-			}
-		}
-	}
+	count := searchDirection(SearchData{
+		row: BoundaryData{Start: 0, Step: 1, Stop: numRows - needleLength + 1},
+		col: BoundaryData{Start: 0, Step: 1, Stop: numColumns - needleLength + 1},
+	}, needle, haystack)
 
 	//--- Downward NE-SW
-	for r := 0; r <= numRows-needleLength; r++ {
-		for c := numColumns - 1; c >= needleLength-1; c-- {
-			numMatches := 0
-			for offset := 0; offset < needleLength; offset++ {
-				if haystack[r+offset][c-offset] == byte(needle[numMatches]) {
-					numMatches++
-					if numMatches == needleLength {
-						count++
-						numMatches = 0
-					}
-				}
-			}
-		}
-	}
+	count += searchDirection(SearchData{
+		row: BoundaryData{Start: 0, Step: 1, Stop: numRows - needleLength + 1},
+		col: BoundaryData{Start: numColumns - 1, Step: -1, Stop: needleLength - 2},
+	}, needle, haystack)
 
 	//--- Upward SW-NE
-	for r := numRows - 1; r >= needleLength-1; r-- {
-		for c := 0; c <= numColumns-needleLength; c++ {
-			numMatches := 0
-			for offset := 0; offset < needleLength; offset++ {
-				if haystack[r-offset][c+offset] == byte(needle[numMatches]) {
-					numMatches++
-					if numMatches == needleLength {
-						count++
-						numMatches = 0
-					}
-				}
-			}
-		}
-	}
+	count += searchDirection(SearchData{
+		row: BoundaryData{Start: numRows - 1, Step: -1, Stop: needleLength - 2},
+		col: BoundaryData{Start: 0, Step: 1, Stop: numColumns - needleLength + 1},
+	}, needle, haystack)
 
 	//--- Upward SE-NW
-	for r := numRows - 1; r >= needleLength-1; r-- {
-		for c := numColumns - 1; c >= needleLength-1; c-- {
-			numMatches := 0
-			for offset := 0; offset < needleLength; offset++ {
-				if haystack[r-offset][c-offset] == byte(needle[numMatches]) {
-					numMatches++
-					if numMatches == needleLength {
-						count++
-						numMatches = 0
-					}
-				}
-			}
-		}
-	}
+	count += searchDirection(SearchData{
+		row: BoundaryData{Start: numRows - 1, Step: -1, Stop: needleLength - 2},
+		col: BoundaryData{Start: numColumns - 1, Step: -1, Stop: needleLength - 2},
+	}, needle, haystack)
 
 	return count
 }
