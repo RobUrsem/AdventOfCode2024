@@ -54,7 +54,7 @@ func TestMoveGuard(t *testing.T) {
 			},
 			0, 1,
 			LabMap{
-				[]int{GUARD_RIGHT, VISITED},
+				[]int{GUARD_LEFT, VISITED},
 			},
 			true,
 		},
@@ -100,6 +100,10 @@ func TestMoveGuard(t *testing.T) {
 			leavesMap := MoveGuard(tc.input, r, c)
 			if leavesMap != tc.left {
 				t.Errorf("Expected leave map to be: %v but got %v", tc.left, leavesMap)
+			}
+
+			if !areEqual(tc.expected, tc.input) {
+				t.Errorf("Move not correct")
 			}
 		})
 	}

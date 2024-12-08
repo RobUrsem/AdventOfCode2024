@@ -59,9 +59,7 @@ func MoveGuard(labMap LabMap, r, c int) bool {
 
 	switch moveInfo.inFront {
 	case EMPTY:
-		if labMap[r][c] == EMPTY {
-			labMap[r][c] = VISITED
-		}
+		labMap[r][c] = VISITED
 		labMap[moveInfo.r][moveInfo.c] = guard
 	case OBSTACLE:
 		//--- turn right
