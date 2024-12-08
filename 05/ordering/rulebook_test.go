@@ -37,7 +37,7 @@ func createTestInput() []string {
 
 func TestConstructRulebook(t *testing.T) {
 	input := createTestInput()
-	rulebook, err := ConstructRuleBook(input)
+	rulebook, err := ConstructRulebook(input)
 	if err != nil {
 		t.Errorf("got error: %v", err)
 	}

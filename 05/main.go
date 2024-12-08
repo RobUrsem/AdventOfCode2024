@@ -1,11 +1,30 @@
 package main
 
 import (
+	"05/ordering"
 	"advent/shared"
 	"fmt"
 	"log"
 	"path/filepath"
 )
+
+func getMiddle(slice []int) (int, bool) {
+	length := len(slice)
+
+	if length == 0 {
+		return 0, false // Return false if the slice is empty
+	}
+
+	mid := length / 2
+
+	if length%2 == 0 {
+		// Even-length slice: Return the first of the two middle numbers
+		return slice[mid-1], true
+	} else {
+		// Odd-length slice: Return the middle number
+		return slice[mid], true
+	}
+}
 
 func main() {
 	filePath := filepath.Join("data", "input.txt")
@@ -15,5 +34,25 @@ func main() {
 		log.Fatalf("Error reading [%v]: %v", filePath, err)
 	}
 
-	fmt.Print(lines)
+	rulebook, err := ordering.ConstructRulebook(lines)
+	if err != nil {
+		log.Fatalf("Error constructing rulebook: %v", err)
+	}
+
+	updates, err := ordering.GetUpdates(lines)
+	if err != nil {
+		log.Fatalf("Error constructing rulebook: %v", err)
+	}
+
+	validUpdates := ordering.FilterUpdates(updates, rulebook)
+
+	total := 0
+	for _, update := range validUpdates {
+		middle, success := getMiddle(update)
+		if success {
+			total += middle
+		}
+	}
+
+	fmt.Printf("Sum of middle numbers for correct orders: %v", total)
 }

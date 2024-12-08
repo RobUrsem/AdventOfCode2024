@@ -6,8 +6,10 @@ import (
 	"strings"
 )
 
-func convertToList(input string) ([]int, error) {
-	var numbers []int
+type Update []int
+
+func convertToList(input string) (Update, error) {
+	var numbers Update
 	parts := strings.Split(input, ",")
 	for _, part := range parts {
 		num, err := strconv.Atoi(strings.TrimSpace(part))
@@ -20,8 +22,8 @@ func convertToList(input string) ([]int, error) {
 	return numbers, nil
 }
 
-func GetUpdates(lines []string) ([][]int, error) {
-	var updates [][]int
+func GetUpdates(lines []string) ([]Update, error) {
+	var updates []Update
 
 	for _, line := range lines {
 		if strings.Contains(line, ",") {

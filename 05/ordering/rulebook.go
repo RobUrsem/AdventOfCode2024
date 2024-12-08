@@ -9,7 +9,7 @@ import (
 type Rule [2]int
 type Rulebook []Rule
 
-func ConstructRuleBook(lines []string) (Rulebook, error) {
+func ConstructRulebook(lines []string) (Rulebook, error) {
 	pattern := `(\d+)\|(\d+)`
 
 	rx, err := regexp.Compile(pattern)
