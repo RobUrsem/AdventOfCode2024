@@ -44,7 +44,7 @@ func main() {
 		log.Fatalf("Error constructing rulebook: %v", err)
 	}
 
-	validUpdates := ordering.FilterUpdates(updates, rulebook)
+	validUpdates, invalidUpdates := ordering.FilterUpdates(updates, rulebook)
 
 	total := 0
 	for _, update := range validUpdates {
@@ -54,5 +54,16 @@ func main() {
 		}
 	}
 
-	fmt.Printf("Sum of middle numbers for correct orders: %v", total)
+	fmt.Printf("Sum of middle numbers for correct orders: %v\n", total)
+
+	correctedUpdates := ordering.FixUpdates(invalidUpdates, rulebook)
+
+	total = 0
+	for _, update := range correctedUpdates {
+		middle, success := getMiddle(update)
+		if success {
+			total += middle
+		}
+	}
+	fmt.Printf("Sum of middle numbers for corrected orders: %v\n", total)
 }
