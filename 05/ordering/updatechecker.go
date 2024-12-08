@@ -16,7 +16,6 @@ func identifyViolatedRule(update Update, rulebook Rulebook) (int, []int) {
 			contains(update, rule[1]),
 		}
 		if indices[0] >= 0 && indices[1] >= 0 && indices[0] > indices[1] {
-			// fmt.Printf("Violation of rule %v: %v", rule, indices)
 			return i, indices
 		}
 	}
