@@ -22,36 +22,40 @@ type MoveInfo struct {
 	r, c    int
 }
 
-func MoveGuard(labMap LabMap, r, c int) bool {
-
-	var moveInfo MoveInfo
-	guard := labMap[r][c]
+func getNextMove(guard int, r, c int, labMap LabMap) MoveInfo {
 	switch guard {
 	case GUARD_DOWN:
-		moveInfo = MoveInfo{
+		return MoveInfo{
 			r:       r + 1,
 			c:       c,
 			inFront: labMap[r+1][c],
 		}
 	case GUARD_LEFT:
-		moveInfo = MoveInfo{
+		return MoveInfo{
 			r:       r,
 			c:       c - 1,
 			inFront: labMap[r][c-1],
 		}
 	case GUARD_RIGHT:
-		moveInfo = MoveInfo{
+		return MoveInfo{
 			r:       r,
 			c:       c + 1,
 			inFront: labMap[r][c+1],
 		}
 	case GUARD_UP:
-		moveInfo = MoveInfo{
+		return MoveInfo{
 			r:       r - 1,
 			c:       c,
 			inFront: labMap[r-1][c],
 		}
 	}
+
+	return MoveInfo{}
+}
+
+func MoveGuard(labMap LabMap, r, c int) bool {
+	guard := labMap[r][c]
+	moveInfo := getNextMove(guard, r, c, labMap)
 
 	switch moveInfo.inFront {
 	case EMPTY:
@@ -71,6 +75,7 @@ func MoveGuard(labMap LabMap, r, c int) bool {
 		case GUARD_RIGHT:
 			labMap[r][c] = GUARD_DOWN
 		}
+		return leaveMap(labMap, r, c, labMap[r][c])
 	case VISITED:
 		labMap[moveInfo.r][moveInfo.c] = guard
 	}

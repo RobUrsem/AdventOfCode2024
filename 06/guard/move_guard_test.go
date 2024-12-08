@@ -58,6 +58,36 @@ func TestMoveGuard(t *testing.T) {
 			},
 			true,
 		},
+		{
+			"Turn up to right and leave",
+			LabMap{
+				[]int{EMPTY, EMPTY},
+				[]int{EMPTY, OBSTACLE},
+				[]int{EMPTY, GUARD_UP},
+			},
+			2, 1,
+			LabMap{
+				[]int{EMPTY, EMPTY},
+				[]int{EMPTY, OBSTACLE},
+				[]int{EMPTY, GUARD_RIGHT},
+			},
+			true,
+		},
+		{
+			"Turn up to right and not leave",
+			LabMap{
+				[]int{EMPTY, EMPTY},
+				[]int{OBSTACLE, EMPTY},
+				[]int{GUARD_UP, EMPTY},
+			},
+			2, 0,
+			LabMap{
+				[]int{EMPTY, EMPTY},
+				[]int{OBSTACLE, EMPTY},
+				[]int{GUARD_RIGHT, EMPTY},
+			},
+			false,
+		},
 	}
 
 	for _, tc := range testCases {
