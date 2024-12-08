@@ -41,7 +41,7 @@ func main() {
 
 	updates, err := ordering.GetUpdates(lines)
 	if err != nil {
-		log.Fatalf("Error constructing rulebook: %v", err)
+		log.Fatalf("Error getting updates: %v", err)
 	}
 
 	validUpdates, invalidUpdates := ordering.FilterUpdates(updates, rulebook)
