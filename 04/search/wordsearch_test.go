@@ -221,3 +221,145 @@ func TestFullGrid(t *testing.T) {
 		})
 	}
 }
+
+func TestSearchForCross(t *testing.T) {
+	needle := "MAS"
+	testCases := []struct {
+		name     string
+		input    []string
+		expected int
+	}{
+		{"X-MAS with dots NWSE-SWNE", []string{
+			"M.S",
+			".A.",
+			"M.S",
+		}, 1},
+		{"X-MAS with dots NESW-SENW", []string{
+			"S.M",
+			".A.",
+			"S.M",
+		}, 1},
+		{"X-MAS with dots NWSE-NESW", []string{
+			"M.M",
+			".A.",
+			"S.S",
+		}, 1},
+		{"X-MAS with dots SWNE-SENW", []string{
+			"S.S",
+			".A.",
+			"M.M",
+		}, 1},
+		{"X-MAS 2 times NWSE-SWNE", []string{
+			"M.S",
+			".A.",
+			"M.S",
+			".A.",
+			"M.S",
+		}, 2},
+		{"X-MAS 2 times NESW-SENW", []string{
+			"S.M.S",
+			".A.A.",
+			"S.M.S",
+		}, 2},
+		{"X-MAS 2 times NWSE-NESW", []string{
+			"S.S",
+			".A.",
+			"M.M",
+			".A.",
+			"S.S",
+		}, 2},
+		{"X-MAS 2 times SWNE-SENW", []string{
+			"S.S.S",
+			".A.A.",
+			"M.M.M",
+		}, 2},
+		{"Close but not right", []string{
+			"M.S",
+			".A.",
+			"M.x",
+		}, 0},
+		{"One pattern SWNE, SENW", []string{
+			"SMS",
+			"AAM",
+			"MSM",
+		}, 1},
+		{"One pattern NWSE, NESW", []string{
+			"MSM",
+			"MAA",
+			"SMS",
+		}, 1},
+		{"Two patterns", []string{
+			"MSMS",
+			"MAAM",
+			"SMSM",
+		}, 2},
+	}
+
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			num, err := SearchForCross(needle, testCase.input)
+			if err != nil {
+				t.Errorf("%v: got error %v", testCase.name, err)
+			}
+
+			if num != testCase.expected {
+				t.Errorf("%v: expected %v but got %v", testCase.name, testCase.expected, num)
+			}
+		})
+	}
+}
+
+func TestCrossesFullGrid(t *testing.T) {
+	needle := "MAS"
+	testCases := []struct {
+		name     string
+		input    []string
+		expected int
+	}{
+		{"full grid", []string{
+			"MMMSXXMASM", // 0
+			"MSAMXMSMSA", // 1
+			"AMXSXMAAMM", // 2
+			"MSAMASMSMX", // 3
+			"XMASAMXAMM", // 4
+			"XXAMMXXAMA", // 5
+			"SMSMSASXSS", // 6
+			"SAXAMASAAA", // 7
+			"MAMMMXMMMM", // 8
+			"MXMXAXMASX", // 9
+		}, 9},
+		{"full grid with dots", []string{
+			//0123456789
+			".M.S......", // 0
+			"..A..MSMS.", // 1
+			".M.S.MAA..", // 2
+			"..A.ASMSM.", // 3
+			".M.S.M....", // 4
+			"..........", // 5
+			"S.S.S.S.S.", // 6
+			".A.A.A.A..", // 7
+			"M.M.M.M.M.", // 8
+			"..........", // 9
+		}, 9},
+	}
+
+	// Horizontal : 5
+	// Vertical   : 3 [99-69U, 39-69D, 46-16U]
+	// Diagonal  NWSE : 1
+	// Diagonal  NESW : 1
+	// Diagonal  SWNE : 4
+	// Diagonal  SENW : 4
+	for _, testCase := range testCases {
+		t.Run(testCase.name, func(t *testing.T) {
+			num, err := SearchForCross(needle, testCase.input)
+
+			if err != nil {
+				t.Errorf("%v: error encountered: %v", testCase.name, err)
+			}
+
+			if num != testCase.expected {
+				t.Errorf("%v: expected %v but got %v", testCase.name, testCase.expected, num)
+			}
+		})
+	}
+}

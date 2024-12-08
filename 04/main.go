@@ -19,4 +19,11 @@ func main() {
 	needle := "XMAS"
 	numTimes := search.SearchForWord(needle, lines)
 	fmt.Printf("Found %v a total of %v times\n", needle, numTimes)
+
+	needle = "MAS"
+	numTimes, err = search.SearchForCross(needle, lines)
+	if err != nil {
+		fmt.Printf("Oops, encountered an error: %v", err)
+	}
+	fmt.Printf("Found cross a total of %v times\n", numTimes)
 }
