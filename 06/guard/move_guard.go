@@ -75,6 +75,7 @@ func MoveGuard(labMap LabMap, r, c int) bool {
 		}
 		return leaveMap(labMap, r, c, labMap[r][c])
 	case VISITED:
+		labMap[r][c] = VISITED
 		labMap[moveInfo.r][moveInfo.c] = guard
 	}
 

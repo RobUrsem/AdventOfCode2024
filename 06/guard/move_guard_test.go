@@ -1,6 +1,9 @@
 package guard
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestMoveGuard(t *testing.T) {
 	testCases := []struct {
@@ -88,6 +91,17 @@ func TestMoveGuard(t *testing.T) {
 			},
 			false,
 		},
+		{
+			"Visiting a visited location",
+			LabMap{
+				[]int{VISITED, VISITED, GUARD_LEFT, VISITED},
+			},
+			0, 2,
+			LabMap{
+				[]int{VISITED, GUARD_LEFT, VISITED, VISITED},
+			},
+			false,
+		},
 	}
 
 	for _, tc := range testCases {
@@ -103,7 +117,11 @@ func TestMoveGuard(t *testing.T) {
 			}
 
 			if !areEqual(tc.expected, tc.input) {
-				t.Errorf("Move not correct")
+				fmt.Println("Expected")
+				PrintMap(tc.expected)
+				fmt.Println("Got")
+				PrintMap(tc.input)
+				t.Errorf("Output map is not expected")
 			}
 		})
 	}
