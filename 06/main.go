@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	filePath := filepath.Join("data", "input.txt")
+	filePath := filepath.Join("data", "test_input.txt")
 
 	lines, err := shared.ReadInput(filePath)
 	if err != nil {
@@ -23,6 +23,7 @@ func main() {
 	}
 
 	guardLeaves := false
+	lastMoveWasTurn := false
 	moveCounter := 0
 	for {
 		// fmt.Printf("\nMove: %v\n", moveCounter)
@@ -34,7 +35,7 @@ func main() {
 			return
 		}
 
-		guardLeaves = guard.MoveGuard(labMap, r, c)
+		guardLeaves, lastMoveWasTurn = guard.MoveGuard(labMap, r, c, lastMoveWasTurn)
 		if guardLeaves {
 			break
 		}
@@ -45,7 +46,8 @@ func main() {
 		}
 	}
 
-	// guard.PrintMap(labMap)
+	fmt.Println("\nFinal location")
+	guard.PrintMap(labMap)
 	fmt.Printf("The guard made %v moves\n", moveCounter)
 	visited := guard.CountVisited(labMap)
 	fmt.Printf("The guard visited %v positions before leaving", visited+1)

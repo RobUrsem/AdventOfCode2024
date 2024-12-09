@@ -111,7 +111,7 @@ func TestMoveGuard(t *testing.T) {
 				t.Errorf("Expected start pos to be (%v,%v) but got (%v,%v)", tc.start_r, tc.start_c, r, c)
 			}
 
-			leavesMap := MoveGuard(tc.input, r, c)
+			leavesMap, _ := MoveGuard(tc.input, r, c, false)
 			if leavesMap != tc.left {
 				t.Errorf("Expected leave map to be: %v but got %v", tc.left, leavesMap)
 			}

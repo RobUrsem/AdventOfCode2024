@@ -8,6 +8,9 @@ const (
 	EMPTY = iota
 	OBSTACLE
 	VISITED
+	VISITED_VERTICAL
+	VISITED_HORIZONTAL
+	VISITED_BOTH
 	GUARD_UP
 	GUARD_LEFT
 	GUARD_DOWN
@@ -40,6 +43,12 @@ func ConstructMap(lines []string) (LabMap, error) {
 				row[j] = GUARD_LEFT
 			case 'X':
 				row[j] = VISITED
+			case '|':
+				row[j] = VISITED_VERTICAL
+			case '-':
+				row[j] = VISITED_HORIZONTAL
+			case '+':
+				row[j] = VISITED_BOTH
 			default:
 				return nil, ErrInvalidCharacter
 			}

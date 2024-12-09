@@ -53,14 +53,33 @@ func getNextMove(guard int, r, c int, labMap LabMap) MoveInfo {
 	return MoveInfo{}
 }
 
-func MoveGuard(labMap LabMap, r, c int) bool {
+func markPreviousPos(labMap LabMap, r, c int, guardDir int, lastMoveWasTurn bool) {
+	if lastMoveWasTurn {
+		labMap[r][c] = VISITED_BOTH
+	} else {
+		switch guardDir {
+		case GUARD_DOWN:
+			labMap[r][c] = VISITED_VERTICAL
+		case GUARD_UP:
+			labMap[r][c] = VISITED_VERTICAL
+		case GUARD_LEFT:
+			labMap[r][c] = VISITED_HORIZONTAL
+		case GUARD_RIGHT:
+			labMap[r][c] = VISITED_HORIZONTAL
+		}
+	}
+}
+
+func MoveGuard(labMap LabMap, r, c int, lastMoveNeedsCross bool) (bool, bool) {
 	guard := labMap[r][c]
 	moveInfo := getNextMove(guard, r, c, labMap)
 
+	nextMoveNeedsCross := false
 	switch moveInfo.inFront {
 	case EMPTY:
-		labMap[r][c] = VISITED
+		markPreviousPos(labMap, r, c, guard, lastMoveNeedsCross)
 		labMap[moveInfo.r][moveInfo.c] = guard
+		nextMoveNeedsCross = false
 	case OBSTACLE:
 		//--- turn right
 		switch guard {
@@ -73,11 +92,24 @@ func MoveGuard(labMap LabMap, r, c int) bool {
 		case GUARD_RIGHT:
 			labMap[r][c] = GUARD_DOWN
 		}
-		return leaveMap(labMap, r, c, labMap[r][c])
-	case VISITED:
-		labMap[r][c] = VISITED
+		return leaveMap(labMap, r, c, labMap[r][c]), true
+	case VISITED: //--- General "visited" items don't capture direction
+		markPreviousPos(labMap, r, c, guard, lastMoveNeedsCross)
 		labMap[moveInfo.r][moveInfo.c] = guard
+		nextMoveNeedsCross = true
+	case VISITED_HORIZONTAL: //--- We're crossing a horizontal line
+		markPreviousPos(labMap, r, c, guard, lastMoveNeedsCross)
+		labMap[moveInfo.r][moveInfo.c] = guard
+		nextMoveNeedsCross = true
+	case VISITED_VERTICAL: //--- We're crossing a vertical line
+		markPreviousPos(labMap, r, c, guard, lastMoveNeedsCross)
+		labMap[moveInfo.r][moveInfo.c] = guard
+		nextMoveNeedsCross = true
+	case VISITED_BOTH: //--- This already is an intersection or a turn
+		markPreviousPos(labMap, r, c, guard, lastMoveNeedsCross)
+		labMap[moveInfo.r][moveInfo.c] = guard
+		nextMoveNeedsCross = false
 	}
 
-	return leaveMap(labMap, moveInfo.r, moveInfo.c, guard)
+	return leaveMap(labMap, moveInfo.r, moveInfo.c, guard), nextMoveNeedsCross
 }

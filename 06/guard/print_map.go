@@ -12,6 +12,12 @@ func PrintMap(labMap LabMap) {
 				fmt.Print("#")
 			case VISITED:
 				fmt.Print("X")
+			case VISITED_VERTICAL:
+				fmt.Print("|")
+			case VISITED_HORIZONTAL:
+				fmt.Print("-")
+			case VISITED_BOTH:
+				fmt.Print("+")
 			case GUARD_UP:
 				fmt.Print("^")
 			case GUARD_LEFT:
