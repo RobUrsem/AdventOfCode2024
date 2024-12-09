@@ -22,7 +22,7 @@ func TestMoveGuard(t *testing.T) {
 			1, 0,
 			LabMap{
 				[]int{GUARD_UP},
-				[]int{VISITED},
+				[]int{VISITED_VERTICAL},
 			},
 			true,
 		},
@@ -33,7 +33,7 @@ func TestMoveGuard(t *testing.T) {
 			},
 			0, 0,
 			LabMap{
-				[]int{VISITED, GUARD_RIGHT},
+				[]int{VISITED_HORIZONTAL, GUARD_RIGHT},
 			},
 			true,
 		},
@@ -45,7 +45,7 @@ func TestMoveGuard(t *testing.T) {
 			},
 			0, 0,
 			LabMap{
-				[]int{VISITED},
+				[]int{VISITED_VERTICAL},
 				[]int{GUARD_DOWN},
 			},
 			true,
@@ -57,7 +57,7 @@ func TestMoveGuard(t *testing.T) {
 			},
 			0, 1,
 			LabMap{
-				[]int{GUARD_LEFT, VISITED},
+				[]int{GUARD_LEFT, VISITED_HORIZONTAL},
 			},
 			true,
 		},
@@ -94,11 +94,11 @@ func TestMoveGuard(t *testing.T) {
 		{
 			"Visiting a visited location",
 			LabMap{
-				[]int{VISITED, VISITED, GUARD_LEFT, VISITED},
+				[]int{VISITED, VISITED_VERTICAL, GUARD_LEFT, VISITED},
 			},
 			0, 2,
 			LabMap{
-				[]int{VISITED, GUARD_LEFT, VISITED, VISITED},
+				[]int{VISITED, GUARD_LEFT, VISITED_HORIZONTAL, VISITED},
 			},
 			false,
 		},
@@ -111,7 +111,7 @@ func TestMoveGuard(t *testing.T) {
 				t.Errorf("Expected start pos to be (%v,%v) but got (%v,%v)", tc.start_r, tc.start_c, r, c)
 			}
 
-			leavesMap, _ := MoveGuard(tc.input, r, c, false)
+			leavesMap, _, _ := MoveGuard(tc.input, r, c, false)
 			if leavesMap != tc.left {
 				t.Errorf("Expected leave map to be: %v but got %v", tc.left, leavesMap)
 			}

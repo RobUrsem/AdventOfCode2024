@@ -70,7 +70,7 @@ func markPreviousPos(labMap LabMap, r, c int, guardDir int, lastMoveWasTurn bool
 	}
 }
 
-func MoveGuard(labMap LabMap, r, c int, lastMoveNeedsCross bool) (bool, bool) {
+func MoveGuard(labMap LabMap, r, c int, lastMoveNeedsCross bool) (bool, bool, bool) {
 	guard := labMap[r][c]
 	moveInfo := getNextMove(guard, r, c, labMap)
 
@@ -92,7 +92,7 @@ func MoveGuard(labMap LabMap, r, c int, lastMoveNeedsCross bool) (bool, bool) {
 		case GUARD_RIGHT:
 			labMap[r][c] = GUARD_DOWN
 		}
-		return leaveMap(labMap, r, c, labMap[r][c]), true
+		return leaveMap(labMap, r, c, labMap[r][c]), true, true
 	case VISITED: //--- General "visited" items don't capture direction
 		markPreviousPos(labMap, r, c, guard, lastMoveNeedsCross)
 		labMap[moveInfo.r][moveInfo.c] = guard
@@ -111,5 +111,5 @@ func MoveGuard(labMap LabMap, r, c int, lastMoveNeedsCross bool) (bool, bool) {
 		nextMoveNeedsCross = false
 	}
 
-	return leaveMap(labMap, moveInfo.r, moveInfo.c, guard), nextMoveNeedsCross
+	return leaveMap(labMap, moveInfo.r, moveInfo.c, guard), nextMoveNeedsCross, false
 }

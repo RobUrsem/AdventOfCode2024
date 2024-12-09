@@ -22,33 +22,13 @@ func main() {
 		return
 	}
 
-	guardLeaves := false
-	lastMoveWasTurn := false
-	moveCounter := 0
-	for {
-		// fmt.Printf("\nMove: %v\n", moveCounter)
-		// guard.PrintMap(labMap)
-
-		r, c := guard.FindGuard(labMap)
-		if r == -1 || c == -1 {
-			fmt.Printf("Could not find a guard")
-			return
-		}
-
-		guardLeaves, lastMoveWasTurn = guard.MoveGuard(labMap, r, c, lastMoveWasTurn)
-		if guardLeaves {
-			break
-		}
-		moveCounter++
-
-		if moveCounter > 25000 {
-			break
-		}
+	_, err = guard.DoWalk(labMap)
+	if err != nil {
+		fmt.Printf("Error finding solution: %v", err)
+	} else {
+		fmt.Println("\nFinal location")
+		guard.PrintMap(labMap)
+		visited := guard.CountVisited(labMap)
+		fmt.Printf("The guard visited %v positions before leaving", visited+1)
 	}
-
-	fmt.Println("\nFinal location")
-	guard.PrintMap(labMap)
-	fmt.Printf("The guard made %v moves\n", moveCounter)
-	visited := guard.CountVisited(labMap)
-	fmt.Printf("The guard visited %v positions before leaving", visited+1)
 }
