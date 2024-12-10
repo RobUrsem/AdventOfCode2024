@@ -4,6 +4,7 @@ const (
 	NOP = iota
 	ADD
 	MUL
+	CAT
 )
 
 type Equation struct {

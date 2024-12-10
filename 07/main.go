@@ -19,14 +19,27 @@ func main() {
 	equations := puzzle.GetEquations(lines)
 	fmt.Printf("Got %v equations\n", len(equations))
 
+	operations := []int{puzzle.ADD, puzzle.MUL}
 	total := int64(0)
 	for _, equation := range equations {
-		solved := puzzle.SolveEquation(equation)
+		solved := puzzle.SolveEquation(equation, operations)
 
 		if solved.Valid {
 			total += solved.Answer
 		}
 	}
 
-	fmt.Printf("Total of the valid equations: %v\n", total)
+	fmt.Printf("Total of the valid equations with two operations: %v\n", total)
+
+	operations = []int{puzzle.ADD, puzzle.MUL, puzzle.CAT}
+	total = int64(0)
+	for _, equation := range equations {
+		solved := puzzle.SolveEquation(equation, operations)
+
+		if solved.Valid {
+			total += solved.Answer
+		}
+	}
+
+	fmt.Printf("Total of the valid equations with three operations: %v\n", total)
 }
