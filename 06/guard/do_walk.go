@@ -2,21 +2,44 @@ package guard
 
 import (
 	"errors"
-	"fmt"
 )
 
 var ErrOutOfMoves = errors.New("out of moves")
 var ErrNoGuard = errors.New("no guard")
+var ErrInfiniteLoop = errors.New("infinite loop")
 
-type Turn []int
-type TurnLocations []Turn
+type Location []int
+type Locations []Location
 
-func DoWalk(labMap LabMap) (TurnLocations, error) {
+func locationsEqual(a, b Location) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
+			return false
+		}
+	}
+	return true
+}
+
+// Function to check if a Location exists in Locations
+func containsLocation(locations Locations, loc Location) bool {
+	for _, existing := range locations {
+		if locationsEqual(existing, loc) {
+			return true
+		}
+	}
+	return false
+}
+
+func DoWalk(labMap LabMap) (Locations, error) {
 	guardLeaves := false
 	lastMoveWasTurn := false
 
-	var turns TurnLocations
+	var turns Locations
 
+	numDuplicateTurns := 0
 	const MAX_MOVES = 25000
 	moveCounter := 0
 	for {
@@ -31,7 +54,14 @@ func DoWalk(labMap LabMap) (TurnLocations, error) {
 		}
 
 		if lastMoveWasTurn {
-			turns = append(turns, Turn{r, c})
+			turn := Location{r, c}
+			if containsLocation(turns, turn) {
+				numDuplicateTurns++
+				if numDuplicateTurns == 4 {
+					return nil, ErrInfiniteLoop
+				}
+			}
+			turns = append(turns, turn)
 		}
 		moveCounter++
 
@@ -44,10 +74,10 @@ func DoWalk(labMap LabMap) (TurnLocations, error) {
 		return nil, ErrOutOfMoves
 	}
 
-	fmt.Printf("Turns\n")
-	for _, turn := range turns {
-		fmt.Printf("turn: (%v, %v)\n", turn[0], turn[1])
-	}
+	// fmt.Printf("Turns\n")
+	// for _, turn := range turns {
+	// 	fmt.Printf("turn: (%v, %v)\n", turn[0], turn[1])
+	// }
 
 	return turns, nil
 }

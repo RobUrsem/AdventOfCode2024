@@ -10,6 +10,8 @@ func PrintMap(labMap LabMap) {
 				fmt.Print(".")
 			case OBSTACLE:
 				fmt.Print("#")
+			case OBSTRUCTION:
+				fmt.Print("O")
 			case VISITED:
 				fmt.Print("X")
 			case VISITED_VERTICAL:

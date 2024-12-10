@@ -7,6 +7,7 @@ import (
 const (
 	EMPTY = iota
 	OBSTACLE
+	OBSTRUCTION
 	VISITED
 	VISITED_VERTICAL
 	VISITED_HORIZONTAL
@@ -33,6 +34,8 @@ func ConstructMap(lines []string) (LabMap, error) {
 				row[j] = EMPTY
 			case '#':
 				row[j] = OBSTACLE
+			case 'O':
+				row[j] = OBSTRUCTION
 			case '^':
 				row[j] = GUARD_UP
 			case '>':
@@ -58,4 +61,16 @@ func ConstructMap(lines []string) (LabMap, error) {
 	}
 
 	return labMap, nil
+}
+
+func CopyMap(theMap LabMap) LabMap {
+	newMap := make(LabMap, len(theMap))
+
+	for i, row := range theMap {
+		newRow := make([]int, len(row))
+		copy(newRow, row)
+		newMap[i] = newRow
+	}
+
+	return newMap
 }

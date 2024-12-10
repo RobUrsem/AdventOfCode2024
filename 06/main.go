@@ -9,7 +9,7 @@ import (
 )
 
 func main() {
-	filePath := filepath.Join("data", "test_input.txt")
+	filePath := filepath.Join("data", "input.txt")
 
 	lines, err := shared.ReadInput(filePath)
 	if err != nil {
@@ -22,6 +22,8 @@ func main() {
 		return
 	}
 
+	mapCopy := guard.CopyMap(labMap)
+
 	_, err = guard.DoWalk(labMap)
 	if err != nil {
 		fmt.Printf("Error finding solution: %v", err)
@@ -29,6 +31,10 @@ func main() {
 		fmt.Println("\nFinal location")
 		guard.PrintMap(labMap)
 		visited := guard.CountVisited(labMap)
-		fmt.Printf("The guard visited %v positions before leaving", visited+1)
+		fmt.Printf("The guard visited %v positions before leaving\n", visited)
 	}
+
+	//--- Part 2
+	obstructions := guard.BruteForceObstructions(mapCopy)
+	fmt.Printf("There are %v obstructions we can choose\n", len(obstructions))
 }

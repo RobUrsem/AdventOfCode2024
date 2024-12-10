@@ -6,7 +6,7 @@ func TestWalkSample(t *testing.T) {
 	testCases := []struct {
 		name     string
 		input    []string
-		expected []Obstruction
+		expected Locations
 	}{
 		{
 			name: "circle 1",
@@ -18,7 +18,7 @@ func TestWalkSample(t *testing.T) {
 				".....", // 3
 				"...#.", // 4
 			},
-			expected: []Obstruction{
+			expected: Locations{
 				{3, 0},
 			},
 		},
@@ -31,7 +31,7 @@ func TestWalkSample(t *testing.T) {
 				"#....",
 				"...#.",
 			},
-			expected: []Obstruction{
+			expected: Locations{
 				{0, 1},
 			},
 		},
@@ -44,7 +44,7 @@ func TestWalkSample(t *testing.T) {
 				"#....",
 				"...#.",
 			},
-			expected: []Obstruction{
+			expected: Locations{
 				{0, 1},
 			},
 		},
@@ -57,12 +57,7 @@ func TestWalkSample(t *testing.T) {
 				t.Error("Error constructing map")
 			}
 
-			turns, err := DoWalk(labMap)
-			if err != nil {
-				t.Error("Error walking map")
-			}
-
-			obstructions := FindPattern(labMap, turns)
+			obstructions := BruteForceObstructions(labMap)
 			if len(obstructions) != len(tc.expected) {
 				t.Errorf("Expected %v obstructions, but got %v", len(tc.expected), len(obstructions))
 			}
@@ -78,7 +73,7 @@ func TestWalkSample(t *testing.T) {
 	}
 }
 
-func TestWalkExampleProblem(t *testing.T) {
+func TestBruteForceExampleProblem(t *testing.T) {
 	example := []string{
 		"....#.....",
 		".........#",
@@ -106,12 +101,7 @@ func TestWalkExampleProblem(t *testing.T) {
 		t.Error("Error constructing map")
 	}
 
-	turns, err := DoWalk(labMap)
-	if err != nil {
-		t.Error("Error walking map")
-	}
-
-	obstructions := FindPattern(labMap, turns)
+	obstructions := BruteForceObstructions(labMap)
 
 	if len(obstructions) != len(expected) {
 		t.Errorf("Expected %v obstructions, but got %v", len(expected), len(obstructions))

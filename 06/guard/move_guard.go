@@ -80,7 +80,7 @@ func MoveGuard(labMap LabMap, r, c int, lastMoveNeedsCross bool) (bool, bool, bo
 		markPreviousPos(labMap, r, c, guard, lastMoveNeedsCross)
 		labMap[moveInfo.r][moveInfo.c] = guard
 		nextMoveNeedsCross = false
-	case OBSTACLE:
+	case OBSTACLE, OBSTRUCTION:
 		//--- turn right
 		switch guard {
 		case GUARD_DOWN:
@@ -93,15 +93,7 @@ func MoveGuard(labMap LabMap, r, c int, lastMoveNeedsCross bool) (bool, bool, bo
 			labMap[r][c] = GUARD_DOWN
 		}
 		return leaveMap(labMap, r, c, labMap[r][c]), true, true
-	case VISITED: //--- General "visited" items don't capture direction
-		markPreviousPos(labMap, r, c, guard, lastMoveNeedsCross)
-		labMap[moveInfo.r][moveInfo.c] = guard
-		nextMoveNeedsCross = true
-	case VISITED_HORIZONTAL: //--- We're crossing a horizontal line
-		markPreviousPos(labMap, r, c, guard, lastMoveNeedsCross)
-		labMap[moveInfo.r][moveInfo.c] = guard
-		nextMoveNeedsCross = true
-	case VISITED_VERTICAL: //--- We're crossing a vertical line
+	case VISITED, VISITED_HORIZONTAL, VISITED_VERTICAL:
 		markPreviousPos(labMap, r, c, guard, lastMoveNeedsCross)
 		labMap[moveInfo.r][moveInfo.c] = guard
 		nextMoveNeedsCross = true
