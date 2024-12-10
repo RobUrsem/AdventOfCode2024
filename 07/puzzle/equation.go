@@ -7,24 +7,25 @@ const (
 )
 
 type Equation struct {
-	answer       int64
-	coefficients []int64
-	operators    []int
+	Answer       int64
+	Coefficients []int64
+	Operators    []int
+	Valid        bool
 }
 
 type Equations []Equation
 
 func AreEqual(a, b Equation) bool {
-	if a.answer != b.answer {
+	if a.Answer != b.Answer {
 		return false
 	}
 
-	if len(a.coefficients) != len(b.coefficients) {
+	if len(a.Coefficients) != len(b.Coefficients) {
 		return false
 	}
 
-	for i := 0; i < len(a.coefficients); i++ {
-		if a.coefficients[i] != b.coefficients[i] {
+	for i := 0; i < len(a.Coefficients); i++ {
+		if a.Coefficients[i] != b.Coefficients[i] {
 			return false
 		}
 	}

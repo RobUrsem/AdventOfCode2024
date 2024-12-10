@@ -24,12 +24,12 @@ func GetEquations(lines []string) Equations {
 			if i == 0 {
 				num, err := strconv.ParseInt(match[1], 10, 64)
 				if err == nil {
-					equation.answer = num
+					equation.Answer = num
 				}
 			} else {
 				num, err := strconv.ParseInt(match[2], 10, 64)
 				if err == nil {
-					equation.coefficients = append(equation.coefficients, num)
+					equation.Coefficients = append(equation.Coefficients, num)
 				}
 			}
 		}

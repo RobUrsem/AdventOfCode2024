@@ -18,4 +18,15 @@ func main() {
 
 	equations := puzzle.GetEquations(lines)
 	fmt.Printf("Got %v equations\n", len(equations))
+
+	total := int64(0)
+	for _, equation := range equations {
+		solved := puzzle.SolveEquation(equation)
+
+		if solved.Valid {
+			total += solved.Answer
+		}
+	}
+
+	fmt.Printf("Total of the valid equations: %v\n", total)
 }
