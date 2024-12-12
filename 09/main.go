@@ -1,6 +1,7 @@
 package main
 
 import (
+	"09/puzzle"
 	"advent/shared"
 	"fmt"
 	"log"
@@ -15,5 +16,13 @@ func main() {
 		log.Fatalf("Error reading [%v]: %v", filePath, err)
 	}
 
-	fmt.Println(lines)
+	if len(lines) > 1 {
+		fmt.Printf("Expected single line input")
+		return
+	}
+
+	output := puzzle.Expand(lines[0])
+	compressed := puzzle.Compress(output)
+	checksum := puzzle.Checksum(compressed)
+	fmt.Printf("Checksum: %v\n", checksum)
 }
