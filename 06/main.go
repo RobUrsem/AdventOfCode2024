@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"path/filepath"
+	"time"
 )
 
 func main() {
@@ -35,6 +36,12 @@ func main() {
 	}
 
 	//--- Part 2
+	t := time.Now()
+	fmt.Println(t.Format("2006-01-02 15:04:05"))
+
 	obstructions := guard.BruteForceObstructions(mapCopy)
 	fmt.Printf("There are %v obstructions we can choose\n", len(obstructions))
+
+	t = time.Now()
+	fmt.Println(t.Format("2006-01-02 15:04:05"))
 }

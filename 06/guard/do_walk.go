@@ -40,7 +40,7 @@ func DoWalk(labMap LabMap) (Locations, error) {
 	var turns Locations
 
 	numDuplicateTurns := 0
-	const MAX_MOVES = 25000
+	maxMoves := len(labMap) * len(labMap[0])
 	moveCounter := 0
 	for {
 		r, c := FindGuard(labMap)
@@ -65,12 +65,12 @@ func DoWalk(labMap LabMap) (Locations, error) {
 		}
 		moveCounter++
 
-		if moveCounter > MAX_MOVES {
+		if moveCounter > maxMoves {
 			break
 		}
 	}
 
-	if moveCounter > MAX_MOVES {
+	if moveCounter > maxMoves {
 		return nil, ErrOutOfMoves
 	}
 
