@@ -1,6 +1,9 @@
 package puzzle
 
-import "strings"
+import (
+	"fmt"
+	"strings"
+)
 
 type Location []int
 type Locations []Location
@@ -8,10 +11,7 @@ type Locations []Location
 type AntennaPositions map[string]Locations
 type AntennaMap []string
 
-const (
-	ANTINODE byte = '#'
-	EMPTY    byte = '.'
-)
+const antinodeBase = byte('#')
 
 func CreateMap(lines []string) AntennaMap {
 	var theMap AntennaMap
@@ -40,25 +40,45 @@ func (m AntennaMap) OutsideMap(r, c int) bool {
 	return r < 0 || c < 0 || r >= len(m) || c >= len(m[0])
 }
 
-func (m AntennaMap) DetermineAntinodes() AntennaPositions {
+func (m AntennaMap) DetermineAntinodes() Locations {
 	pos := m.getAntennaPositions()
 
-	antiNodes := make(AntennaPositions)
-	for char, locs := range pos {
+	var antiNodes Locations
+	for _, locs := range pos {
 		for i := 0; i < len(locs)-1; i++ {
 			for j := i + 1; j < len(locs); j++ {
 				dx := locs[j][0] - locs[i][0]
 				dy := locs[j][1] - locs[i][1]
 				if !m.OutsideMap(locs[i][0]-dx, locs[i][1]-dy) {
-					antiNodes[char] = append(antiNodes[char], Location{locs[i][0] - dx, locs[i][1] - dy})
+					antiNodes = append(antiNodes, Location{locs[i][0] - dx, locs[i][1] - dy})
 				}
 				if !m.OutsideMap(locs[j][0]+dx, locs[j][1]+dy) {
-					antiNodes[char] = append(antiNodes[char], Location{locs[j][0] + dx, locs[j][1] + dy})
+					antiNodes = append(antiNodes, Location{locs[j][0] + dx, locs[j][1] + dy})
 				}
 			}
 		}
 	}
-	return antiNodes
+
+	return removeDuplicates(antiNodes)
+}
+
+func removeDuplicates(locations Locations) Locations {
+	uniqueMap := make(map[string]struct{})
+	var uniqueLocations Locations
+
+	for _, loc := range locations {
+		locKey := fmt.Sprint(loc)
+		if _, exists := uniqueMap[locKey]; !exists {
+			uniqueMap[locKey] = struct{}{}
+			uniqueLocations = append(uniqueLocations, loc)
+		}
+	}
+
+	if len(locations) != len(uniqueLocations) {
+		fmt.Printf("Orig: %v, unique %v\n", len(locations), len(uniqueLocations))
+	}
+
+	return uniqueLocations
 }
 
 func replaceNthChar(s string, n int, newChar rune) string {
@@ -69,15 +89,26 @@ func replaceNthChar(s string, n int, newChar rune) string {
 	return string(runes)
 }
 
+func (a AntennaMap) IsAntenna(r, c int) bool {
+	antenna := "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+	return strings.ContainsAny(antenna, string(a[r][c]))
+}
+
+func (a AntennaMap) AddAntiNode(r, c int) {
+	current := a[r][c]
+	if current == '.' || a.IsAntenna(r, c) {
+		a[r] = replaceNthChar(a[r], c, rune(antinodeBase))
+	} else {
+		newAntiNode := antinodeBase + byte(current-antinodeBase+1)
+		a[r] = replaceNthChar(a[r], c, rune(newAntiNode))
+	}
+}
+
 func (a AntennaMap) Filter() {
 	antiNodes := a.DetermineAntinodes()
-	for _, locs := range antiNodes {
-		for _, loc := range locs {
-			current := a[loc[0]][loc[1]]
-			if current == EMPTY {
-				a[loc[0]] = replaceNthChar(a[loc[0]], loc[1], rune(ANTINODE))
-			}
-		}
+
+	for _, loc := range antiNodes {
+		a.AddAntiNode(loc[0], loc[1])
 	}
 }
 
@@ -89,7 +120,7 @@ func (a AntennaMap) CountAntiNodes() int {
 	count := 0
 	for _, line := range a {
 		for _, char := range line {
-			if char == rune(ANTINODE) {
+			if char == rune(antinodeBase) {
 				count++
 			}
 		}
