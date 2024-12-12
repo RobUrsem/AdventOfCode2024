@@ -21,8 +21,8 @@ func main() {
 		return
 	}
 
-	output := puzzle.Expand(lines[0])
-	compressed := puzzle.Compress(output)
-	checksum := puzzle.Checksum(compressed)
+	disk := puzzle.Analyze(lines[0])
+	fast := puzzle.FastCompress(disk)
+	checksum := puzzle.FastChecksum(fast)
 	fmt.Printf("Checksum: %v\n", checksum)
 }

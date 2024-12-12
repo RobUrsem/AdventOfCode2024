@@ -1,129 +1,8 @@
 package puzzle
 
 import (
-	"fmt"
 	"strconv"
-	"strings"
 )
-
-func GetFileLengths(input string) []int {
-	lengths := []int{}
-	for i := 0; i < len(input); i += 2 {
-		v, _ := strconv.Atoi(string(input[i]))
-		lengths = append(lengths, v)
-	}
-
-	return lengths
-}
-
-func Expand(a string) string {
-	var output string
-
-	x := true
-	count := 0
-	for i := 0; i < len(a); i++ {
-		v, _ := strconv.Atoi(string(a[i]))
-		if x {
-			for j := 0; j < v; j++ {
-				output += fmt.Sprint(count)
-			}
-			count++
-		} else {
-			for j := 0; j < v; j++ {
-				output += "."
-			}
-		}
-		x = !x
-	}
-
-	return output
-}
-
-func getFirstSpace(s string) int {
-	for i := 0; i < len(s); i++ {
-		if s[i] == '.' {
-			return i
-		}
-	}
-	return -1
-}
-
-func getLastNumber(s string) int {
-	for i := len(s) - 1; i >= 0; i-- {
-		if strings.ContainsAny(string(s[i]), "0123456789") {
-			return i
-		}
-	}
-	return -1
-}
-
-func replaceNthChar(s string, n int, newChar rune) string {
-	runes := []rune(s)
-	if n >= 0 && n < len(runes) {
-		runes[n] = newChar
-	}
-	return string(runes)
-}
-
-func EmptySpacesAtTheEnd(disk string, expected int) bool {
-	start := len(disk) - 1
-	end := start - expected
-	for i := start; i >= end; i-- {
-		if disk[i] != '.' {
-			return false
-		}
-	}
-	//--- make sure the next one isn't a space
-	return disk[end-1] != '.'
-}
-
-func MoveBlock(disk string) (string, bool) {
-	//--- find last number
-	lastPos := getLastNumber(disk)
-
-	//--- find first space
-	firstPos := getFirstSpace(disk)
-
-	//--- If index of last number < index of first space => done
-	if lastPos < firstPos {
-		return disk, true
-	}
-
-	//--- replace first space with last number
-	//--- replace last number with a space
-	disk = replaceNthChar(disk, firstPos, rune(disk[lastPos]))
-	disk = replaceNthChar(disk, lastPos, '.')
-
-	return disk, false
-}
-
-func Compress(expanded string) string {
-	disk := expanded
-	done := false
-
-	for {
-		disk, done = MoveBlock(disk)
-		// fmt.Printf("%v\n", disk)
-		if done {
-			break
-		}
-	}
-
-	return disk
-}
-
-func Checksum(disk string) int {
-	checksum := 0
-
-	for i, c := range disk {
-		if c != '.' {
-			v, _ := strconv.Atoi(string(c))
-			checksum += i * v
-		}
-	}
-
-	return checksum
-}
 
 /*
 --------------------------------------------------------------------------
@@ -195,9 +74,16 @@ func FillSpace(b []Block) []Block {
 		if numToMove >= firstSpaceBlock.length {
 			//--- move from last block to first space
 			b[firstSpaceIdx].id = b[lastBlockIdx].id
-			// b[firstSpaceIdx][1] should be numToMove
-			//--- reduce last block
 			b[lastBlockIdx].length -= numToMove
+		} else {
+			//--- split block
+			splitSize := b[firstSpaceIdx].length - numToMove
+			b[firstSpaceIdx].id = b[lastBlockIdx].id
+			b[firstSpaceIdx].length = numToMove
+			b[lastBlockIdx].id = -1
+			b[lastBlockIdx].length -= numToMove
+			newBlock := Block{-1, splitSize}
+			b = append(b[:firstSpaceIdx+1], append([]Block{newBlock}, b[firstSpaceIdx+1:]...)...)
 		}
 	}
 
@@ -233,4 +119,16 @@ func FastCompress(b []Block) []Block {
 		b = DiscardTrailingSpaces(b)
 	}
 	return b
+}
+
+func FastChecksum(b []Block) int {
+	idx := 0
+	count := 0
+	for _, block := range b {
+		for i := 0; i < block.length; i++ {
+			count += idx * block.id
+			idx++
+		}
+	}
+	return count
 }
