@@ -17,7 +17,8 @@ func main() {
 	}
 
 	theMap := puzzle.CreateMap(lines)
-	theMap.DetermineAntinodes()
+	theMap.Filter()
 
-	fmt.Printf(theMap[0])
+	fmt.Println(theMap)
+	fmt.Printf("Total antinodes: %v\n", theMap.CountAntiNodes())
 }
