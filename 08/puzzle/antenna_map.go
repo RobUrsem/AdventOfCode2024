@@ -40,8 +40,15 @@ func (m AntennaMap) OutsideMap(r, c int) bool {
 	return r < 0 || c < 0 || r >= len(m) || c >= len(m[0])
 }
 
-func (m AntennaMap) DetermineAntinodes() Locations {
+func (m AntennaMap) DetermineAntinodes(useHarmonics bool) Locations {
 	pos := m.getAntennaPositions()
+
+	startIter := 1
+	maxNodes := 1
+	if useHarmonics {
+		maxNodes = 999
+		startIter = 0
+	}
 
 	var antiNodes Locations
 	for _, locs := range pos {
@@ -49,11 +56,21 @@ func (m AntennaMap) DetermineAntinodes() Locations {
 			for j := i + 1; j < len(locs); j++ {
 				dx := locs[j][0] - locs[i][0]
 				dy := locs[j][1] - locs[i][1]
-				if !m.OutsideMap(locs[i][0]-dx, locs[i][1]-dy) {
-					antiNodes = append(antiNodes, Location{locs[i][0] - dx, locs[i][1] - dy})
-				}
-				if !m.OutsideMap(locs[j][0]+dx, locs[j][1]+dy) {
-					antiNodes = append(antiNodes, Location{locs[j][0] + dx, locs[j][1] + dy})
+				outside := []bool{false, false}
+				for iter := startIter; iter <= maxNodes && (!outside[0] || !outside[1]); iter++ {
+					a := locs[i][0] - iter*dx
+					b := locs[i][1] - iter*dy
+					outside[0] = m.OutsideMap(a, b)
+					if !outside[0] {
+						antiNodes = append(antiNodes, Location{a, b})
+					}
+
+					c := locs[j][0] + iter*dx
+					d := locs[j][1] + iter*dy
+					outside[1] = m.OutsideMap(c, d)
+					if !outside[1] {
+						antiNodes = append(antiNodes, Location{c, d})
+					}
 				}
 			}
 		}
@@ -104,8 +121,8 @@ func (a AntennaMap) AddAntiNode(r, c int) {
 	}
 }
 
-func (a AntennaMap) Filter() {
-	antiNodes := a.DetermineAntinodes()
+func (a AntennaMap) Filter(useHarmonics bool) {
+	antiNodes := a.DetermineAntinodes(useHarmonics)
 
 	for _, loc := range antiNodes {
 		a.AddAntiNode(loc[0], loc[1])

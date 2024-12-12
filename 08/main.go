@@ -17,7 +17,10 @@ func main() {
 	}
 
 	theMap := puzzle.CreateMap(lines)
-	theMap.Filter()
+
+	//--- Set to true for part B
+	useHarmonics := true
+	theMap.Filter(useHarmonics)
 
 	fmt.Println(theMap)
 	fmt.Printf("Total antinodes: %v\n", theMap.CountAntiNodes())

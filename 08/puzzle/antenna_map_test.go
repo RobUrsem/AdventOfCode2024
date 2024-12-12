@@ -7,20 +7,51 @@ import (
 
 func TestAntennaMap(t *testing.T) {
 	testCases := []struct {
-		name     string
-		input    []string
-		expected AntennaMap
-		num      int
+		name         string
+		input        []string
+		useHarmonics bool
+		expected     AntennaMap
+		num          int
 	}{
 		{
 			name: "two antinodes",
 			input: []string{
 				"...a..a.....",
 			},
+			useHarmonics: false,
 			expected: AntennaMap{
 				"#..a..a..#..",
 			},
 			num: 2,
+		},
+		{
+			name: "Using harmonics",
+			input: []string{
+				"T.........",
+				"...T......",
+				".T........",
+				"..........",
+				"..........",
+				"..........",
+				"..........",
+				"..........",
+				"..........",
+				"..........",
+			},
+			useHarmonics: true,
+			expected: AntennaMap{
+				"#....#....",
+				"...#......",
+				".#....#...",
+				".........#",
+				"..#.......",
+				"..........",
+				"...#......",
+				"..........",
+				"....#.....",
+				"..........",
+			},
+			num: 9,
 		},
 		{
 			name: "overlapping with antenna A",
@@ -36,6 +67,7 @@ func TestAntennaMap(t *testing.T) {
 				"..........",
 				"..........",
 			},
+			useHarmonics: false,
 			expected: AntennaMap{
 				"..........",
 				"...#......",
@@ -66,6 +98,7 @@ func TestAntennaMap(t *testing.T) {
 				"............",
 				"............",
 			},
+			useHarmonics: false,
 			expected: AntennaMap{
 				"......#....#",
 				"...#....0...",
@@ -81,6 +114,39 @@ func TestAntennaMap(t *testing.T) {
 				"..........#.",
 			},
 			num: 14,
+		},
+		{
+			name: "example - with Harmonics",
+			input: []string{
+				"............",
+				"........0...",
+				".....0......",
+				".......0....",
+				"....0.......",
+				"......A.....",
+				"............",
+				"............",
+				"........A...",
+				".........A..",
+				"............",
+				"............",
+			},
+			useHarmonics: true,
+			expected: AntennaMap{
+				"##....#....#",
+				".#.#....#...",
+				"..#.##....#.",
+				"..##...#....",
+				"....#....#..",
+				".#...##....#",
+				"...#..#.....",
+				"#....#.#....",
+				"..#.....#...",
+				"....#....#..",
+				".#........#.",
+				"...#......##",
+			},
+			num: 34,
 		},
 		{
 			name: "Full Input",
@@ -136,6 +202,7 @@ func TestAntennaMap(t *testing.T) {
 				".....................................5...........G",
 				".................................8................",
 			},
+			useHarmonics: false,
 			expected: []string{
 				"..........K......#......#..........A..............",
 				".#.........................#......A...............",
@@ -195,7 +262,7 @@ func TestAntennaMap(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			theMap := CreateMap(tc.input)
-			theMap.Filter()
+			theMap.Filter(tc.useHarmonics)
 
 			fmt.Println(theMap)
 			if !theMap.IsSameAs(tc.expected) {
