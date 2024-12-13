@@ -24,16 +24,19 @@ func TestGetFiles(t *testing.T) {
 		expanded   string
 		compressed string
 		checksum   int
+		checksum2  int
 	}{
 		{
-			name:     "1",
-			input:    "12345",
-			checksum: 60,
+			name:      "1",
+			input:     "12345",
+			checksum:  60,
+			checksum2: 132,
 		},
 		{
-			name:     "2",
-			input:    "2333133121414131402",
-			checksum: 1928,
+			name:      "2",
+			input:     "2333133121414131402",
+			checksum:  1928,
+			checksum2: 2858,
 		},
 	}
 
@@ -45,6 +48,13 @@ func TestGetFiles(t *testing.T) {
 
 			if checksum != tc.checksum {
 				t.Errorf("Expected checksum %v but got %v", tc.checksum, checksum)
+			}
+
+			disk = Analyze(tc.input)
+			defrag := Defrag(disk)
+			checksum = FastChecksum(defrag)
+			if checksum != tc.checksum2 {
+				t.Errorf("Expected checksum %v but got %v", tc.checksum2, checksum)
 			}
 		})
 	}

@@ -25,4 +25,9 @@ func main() {
 	fast := puzzle.FastCompress(disk)
 	checksum := puzzle.FastChecksum(fast)
 	fmt.Printf("Checksum: %v\n", checksum)
+
+	disk = puzzle.Analyze(lines[0])
+	defrag := puzzle.Defrag(disk)
+	checksum = puzzle.FastChecksum(defrag)
+	fmt.Printf("Defrag checksum: %v\n", checksum)
 }
