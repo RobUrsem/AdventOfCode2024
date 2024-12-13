@@ -14,6 +14,7 @@ func TestTrails(t *testing.T) {
 		summits    shared.Locations
 		trails     []shared.Locations
 		scores     []int
+		ratings    []int
 	}{
 		{
 			name: "1",
@@ -59,7 +60,8 @@ func TestTrails(t *testing.T) {
 					shared.NewLocation(6, 6),
 				},
 			},
-			scores: []int{2},
+			scores:  []int{2},
+			ratings: []int{2},
 		},
 		{
 			name: "2",
@@ -118,7 +120,8 @@ func TestTrails(t *testing.T) {
 					shared.NewLocation(0, 4),
 				},
 			},
-			scores: []int{1, 2},
+			scores:  []int{1, 2},
+			ratings: []int{1, 2},
 		},
 		{
 			name: "3",
@@ -153,7 +156,8 @@ func TestTrails(t *testing.T) {
 					shared.NewLocation(0, 3),
 				},
 			},
-			scores: []int{4},
+			scores:  []int{4},
+			ratings: []int{13},
 		},
 		{
 			name: "4",
@@ -197,7 +201,8 @@ func TestTrails(t *testing.T) {
 					shared.NewLocation(0, 3),
 				},
 			},
-			scores: []int{5, 6, 5, 3, 1, 3, 5, 3, 5},
+			scores:  []int{5, 6, 5, 3, 1, 3, 5, 3, 5},
+			ratings: []int{20, 24, 10, 4, 1, 4, 5, 8, 5},
 		},
 	}
 
@@ -214,21 +219,30 @@ func TestTrails(t *testing.T) {
 				t.Errorf("Expected %v summits but got %v", tc.summits, summits)
 			}
 
-			actualTotalScore := 0
-			expectedTotalScore := 0
+			result := []struct {
+				actual   int
+				expected int
+			}{{0, 0}, {0, 0}}
 			for i, th := range trailHeads {
 				summitLocations := shared.Locations{}
-				Venture(tc.input, shared.Locations{th}, &summitLocations)
+				rating := Venture(tc.input, shared.Locations{th}, &summitLocations)
 				score := len(summitLocations)
-				actualTotalScore += score
-				expectedTotalScore += tc.scores[i]
+				result[0].actual += score
+				result[0].expected += tc.scores[i]
+				result[1].actual += rating
+				result[1].expected += tc.ratings[i]
 				fmt.Printf("Summit locations: %v\n", summitLocations)
 				if score != tc.scores[i] {
 					t.Errorf("Expected score %v for trail head %v but got %v", tc.scores[i], th, score)
 				}
 			}
-			if actualTotalScore != expectedTotalScore {
-				t.Errorf("Expected total score of %v but got %v", expectedTotalScore, actualTotalScore)
+
+			if result[0].actual != result[0].expected {
+				t.Errorf("Expected total score of %v but got %v", result[0].expected, result[0].actual)
+			}
+
+			if result[1].actual != result[1].expected {
+				t.Errorf("Expected total rating of %v but got %v", result[1].expected, result[1].actual)
 			}
 		})
 	}

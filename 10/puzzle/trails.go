@@ -44,13 +44,15 @@ func GetNextSteps(input []string, loc shared.Location) shared.Locations {
 	return possible
 }
 
-func Venture(input []string, trail shared.Locations, summits *shared.Locations) {
+func Venture(input []string, trail shared.Locations, summits *shared.Locations) int {
 	options := shared.Locations{{-1, 0}, {1, 0}, {0, 1}, {0, -1}}
 	for _, option := range options {
 		Walk(input, trail, option, summits)
 	}
 
+	numDistinctPaths := len(*summits)
 	*summits = shared.RemoveDuplicates(*summits)
+	return numDistinctPaths
 }
 
 func Walk(input []string, trail shared.Locations, dir shared.Location, summits *shared.Locations) bool {
