@@ -113,10 +113,21 @@ func DiscardTrailingSpaces(blocks []Block) []Block {
 	return blocks
 }
 
+func MergeBlocks(blocks []Block) []Block {
+	for i := 0; i < len(blocks)-1; i++ {
+		if blocks[i].id == blocks[i+1].id {
+			blocks[i].length += blocks[i+1].length
+			blocks = append(blocks[:i+1], blocks[i+2:]...)
+		}
+	}
+	return blocks
+}
+
 func FastCompress(b []Block) []Block {
 	for HasFragmentedSpace(b) {
 		b = FillSpace(b)
 		b = DiscardTrailingSpaces(b)
+		b = MergeBlocks(b)
 	}
 	return b
 }
