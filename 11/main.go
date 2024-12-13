@@ -26,7 +26,7 @@ func main() {
 	}
 
 	outcome := input
-	for i := 0; i < 25; i++ {
+	for i := 0; i < 75; i++ {
 		outcome = puzzle.Blink(outcome)
 	}
 	fmt.Printf("Got %v stones\n", len(outcome))
