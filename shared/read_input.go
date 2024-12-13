@@ -2,7 +2,10 @@ package shared
 
 import (
 	"bufio"
+	"fmt"
 	"os"
+	"strconv"
+	"strings"
 )
 
 func ReadInput(filePath string) ([]string, error) {
@@ -23,4 +26,21 @@ func ReadInput(filePath string) ([]string, error) {
 	}
 
 	return lines, nil
+}
+
+func TextToIntArray(line string) ([]int, error) {
+	parts := strings.Fields(line)
+
+	report := make([]int, len(parts))
+	for i, part := range parts {
+		num, err := strconv.Atoi(part)
+
+		if err != nil {
+			return nil, fmt.Errorf("invalid number: %d", num)
+		}
+
+		report[i] = num
+	}
+
+	return report, nil
 }
