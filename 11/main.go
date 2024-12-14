@@ -18,7 +18,7 @@ func doBlink(input []int, ch chan int) {
 }
 
 func main() {
-	filePath := filepath.Join("data", "input.txt")
+	filePath := filepath.Join("data", "input_test.txt")
 
 	lines, err := shared.ReadInput(filePath)
 	if err != nil {
