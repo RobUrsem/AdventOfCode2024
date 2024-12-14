@@ -1,25 +1,18 @@
 package puzzle
 
 import (
-	"fmt"
 	"math"
+
+	lru "github.com/hashicorp/golang-lru/v2"
 )
+
+type Rule func(int) (bool, []int)
 
 /*
 If the stone is engraved with the number 0,
 it is replaced by a stone engraved with the number 1.
 */
-func applyRuleOne(stones []int, i int) bool {
-	if stones[i] == 0 {
-		stones[i] = 1
-		// fmt.Print("1 ")
-		return true
-	}
-
-	return false
-}
-
-func altApplyRuleOne(stone int) (bool, []int) {
+func ruleOne(stone int) (bool, []int) {
 	if stone == 0 {
 		return true, []int{1}
 	}
@@ -46,24 +39,7 @@ the right half of the digits are engraved on the new right
 stone. (The new numbers don't keep extra leading zeroes:
 1000 would become stones 10 and 0.)
 */
-func applyRuleTwo(stones *[]int, i *int) bool {
-	value := (*stones)[*i]
-	numdigits := numDigits(value)
-	if numdigits%2 == 0 {
-		half := numdigits / 2
-		factor := math.Pow10(half)
-		(*stones)[*i] = int(math.Trunc(float64(value) / factor))
-		right := []int{value - (*stones)[*i]*int(factor)}
-
-		*stones = append((*stones)[:*i+1], append(right, (*stones)[*i+1:]...)...)
-		*i++
-		// fmt.Print("2 ")
-		return true
-	}
-	return false
-}
-
-func altApplyRuleTwo(stone int) (bool, []int) {
+func ruleTwo(stone int) (bool, []int) {
 	numdigits := numDigits(stone)
 	if numdigits%2 == 0 {
 		half := numdigits / 2
@@ -80,34 +56,67 @@ If none of the other rules apply, the stone is replaced
 by a new stone; the old stone's number multiplied by 2024
 is engraved on the new stone.
 */
-func applyRuleThree(stones []int, i int) bool {
-	stones[i] *= 2024
-	// fmt.Print("3 ")
-	return true
-}
-
-func altApplyRuleThree(stone int) (bool, []int) {
+func ruleThree(stone int) (bool, []int) {
 	return true, []int{stone * 2024}
 }
 
-func Blink(stones []int) []int {
-	for i := 0; i < len(stones); i++ {
-		if !applyRuleOne(stones, i) {
-			if !applyRuleTwo(&stones, &i) {
-				applyRuleThree(stones, i)
+// Memoization, we remember what we calculated before
+// Outside class since we update the class contents
+// not pretty but it works
+var memo, _ = lru.New[int, []int](128)
+
+/*
+The Stone Counter stores how many times we have each
+type of stone. Thus we only have to process each
+unique type of stone once and just multiply the outcome
+of each process with the number of times the stone
+occurred.
+
+When we combine this with the memoization, where we
+actually don't process stone types we processed in the
+past, the method becomes very fast
+*/
+type StoneCounter map[int]int
+
+func MakeStoneCounter(arr []int) StoneCounter {
+	s := make(StoneCounter)
+	for _, num := range arr {
+		s[num]++
+	}
+	return s
+}
+
+func (s StoneCounter) Update(arr []int, count int) {
+	for _, v := range arr {
+		s[v] += count
+	}
+}
+
+func (s StoneCounter) Total() int {
+	total := 0
+	for _, count := range s {
+		total += count
+	}
+	return total
+}
+
+func (s *StoneCounter) Blink() {
+	rules := []Rule{ruleOne, ruleTwo, ruleThree}
+	nextStones := StoneCounter{}
+
+	for stone, count := range *s {
+		if cache, ok := memo.Get(stone); ok {
+			nextStones.Update(cache, count)
+		} else {
+			for _, rule := range rules {
+				if used, result := rule(stone); used {
+					memo.Add(stone, result)
+					nextStones.Update(result, count)
+					break
+				}
 			}
 		}
 	}
 
-	fmt.Printf(" -> %v\n", len(stones))
-	return stones
+	*s = nextStones
 }
-
-func RecursiveBlink(stones []int) int {
-	for i := 0; i < len(stones); i++ {
-
-	}
-	return 42
-}
-
-// https://cp-algorithms.com/

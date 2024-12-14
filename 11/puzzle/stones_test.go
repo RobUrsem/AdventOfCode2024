@@ -1,7 +1,6 @@
 package puzzle
 
 import (
-	"advent/shared"
 	"testing"
 )
 
@@ -76,11 +75,14 @@ func TestStones(t *testing.T) {
 
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
-			outcome := tc.input
+			stoneCounter := MakeStoneCounter(tc.input)
 			for i, blink := range tc.expected {
-				outcome = Blink(outcome)
-				if !shared.AreEqualInts(outcome, blink) {
-					t.Errorf("Expected %v for blink %v but got %v", blink, i, outcome)
+				stoneCounter.Blink()
+				numStones := stoneCounter.Total()
+				expectedNumStones := len(blink)
+
+				if numStones != expectedNumStones {
+					t.Errorf("Expected %v for blink %v but got %v", expectedNumStones, i, numStones)
 				}
 			}
 		})

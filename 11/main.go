@@ -5,20 +5,14 @@ import (
 	"advent/shared"
 	"fmt"
 	"log"
+	"os"
 	"path/filepath"
+	"strconv"
 	"time"
 )
 
-func doBlink(input []int, ch chan int) {
-	outcome := input
-	for i := 0; i < 75; i++ {
-		outcome = puzzle.Blink(outcome)
-	}
-	ch <- len(outcome)
-}
-
 func main() {
-	filePath := filepath.Join("data", "input_test.txt")
+	filePath := filepath.Join("data", "input.txt")
 
 	lines, err := shared.ReadInput(filePath)
 	if err != nil {
@@ -34,24 +28,18 @@ func main() {
 		log.Fatalf("Error converting [%v]: %v", lines[0], err)
 	}
 
+	numBlinks, err := strconv.Atoi(os.Args[1])
+	if err != nil {
+		numBlinks = 25
+	}
+
 	start := time.Now()
-	ch := make(chan int, len(input))
-	for _, v := range input {
-		go doBlink([]int{v}, ch)
+	counter := puzzle.MakeStoneCounter(input)
+	for i := 0; i < numBlinks; i++ {
+		counter.Blink()
 	}
-
-	totalStones := 0
-	for range input {
-		totalStones += <-ch
-	}
-	fmt.Printf("Got %v stones\n", totalStones)
-
 	elapsed := time.Since(start)
-	fmt.Printf("Elapsed time: %v\n", elapsed)
 
-	// outcome := input
-	// for i := 0; i < 75; i++ {
-	// 	outcome = puzzle.Blink(outcome)
-	// }
-	// fmt.Printf("Got %v stones\n", len(outcome))
+	fmt.Printf("Got %v stones\n", counter.Total())
+	fmt.Printf("Elapsed time: %v\n", elapsed)
 }
