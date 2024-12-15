@@ -10,6 +10,7 @@ func TestRegion(t *testing.T) {
 		input   []string
 		regions Regions
 		cost    int
+		sides   int
 	}{
 		{
 			name: "1",
@@ -25,10 +26,11 @@ func TestRegion(t *testing.T) {
 				{2, 2, 3, 3},
 				{5, 5, 5, 3},
 			},
-			cost: 4*10 + 4*8 + 4*10 + 1*4 + 3*8,
+			cost:  4*10 + 4*8 + 4*10 + 1*4 + 3*8,
+			sides: 4*4 + 4*4 + 4*8 + 1*4 + 3*4,
 		},
 		{
-			name: "2",
+			name: "XOXO",
 			input: []string{
 				"OOOOO",
 				"OXOXO",
@@ -43,10 +45,51 @@ func TestRegion(t *testing.T) {
 				{1, 4, 1, 5, 1},
 				{1, 1, 1, 1, 1},
 			},
-			cost: 21*32 + 1*4 + 1*4 + 1*4 + 1*4,
+			cost:  21*36 + 1*4 + 1*4 + 1*4 + 1*4,
+			sides: 21*20 + 1*4 + 1*4 + 1*4 + 1*4,
 		},
 		{
-			name: "3",
+			name: "E",
+			input: []string{
+				"EEEEE",
+				"EXXXX",
+				"EEEEE",
+				"EXXXX",
+				"EEEEE",
+			},
+			regions: Regions{
+				{1, 1, 1, 1, 1},
+				{1, 2, 2, 2, 2},
+				{1, 1, 1, 1, 1},
+				{1, 3, 3, 3, 3},
+				{1, 1, 1, 1, 1},
+			},
+			cost:  17*36 + 4*10 + 4*10,
+			sides: 17*12 + 4*4 + 4*4,
+		},
+		{
+			name: "ABBA",
+			input: []string{
+				"AAAAAA",
+				"AAABBA",
+				"AAABBA",
+				"ABBAAA",
+				"ABBAAA",
+				"AAAAAA",
+			},
+			regions: Regions{
+				{1, 1, 1, 1, 1, 1},
+				{1, 1, 1, 2, 2, 1},
+				{1, 1, 1, 2, 2, 1},
+				{1, 3, 3, 1, 1, 1},
+				{1, 3, 3, 1, 1, 1},
+				{1, 1, 1, 1, 1, 1},
+			},
+			cost:  28*40 + 4*8 + 4*8,
+			sides: 28*12 + 4*4 + 4*4,
+		},
+		{
+			name: "Large",
 			input: []string{
 				"RRRRIICCFF",
 				"RRRRIICCCF",
@@ -90,7 +133,8 @@ func TestRegion(t *testing.T) {
 				// "M M   M   I   S   S  J   E   E   E",
 				{15, 15, 15, 13, 17, 17, 9, 12, 12, 12},
 			},
-			cost: 12*18 + 4*8 + 14*28 + 10*18 + 13*20 + 11*20 + 1*4 + 13*18 + 14*22 + 5*12 + 3*8,
+			cost:  12*18 + 4*8 + 14*28 + 10*18 + 13*20 + 11*20 + 1*4 + 13*18 + 14*22 + 5*12 + 3*8,
+			sides: 12*10 + 4*4 + 14*22 + 10*12 + 13*10 + 11*12 + 1*4 + 13*8 + 14*16 + 5*6 + 3*6,
 		},
 	}
 
@@ -110,9 +154,13 @@ func TestRegion(t *testing.T) {
 			}
 
 			cost := CalcCost(regions)
-
 			if cost != tc.cost {
 				t.Errorf("Expected cost of %v but got %v", tc.cost, cost)
+			}
+
+			sides := CalcSides(regions)
+			if sides != tc.sides {
+				t.Errorf("Expected sides of %v but got %v", tc.sides, sides)
 			}
 		})
 	}
