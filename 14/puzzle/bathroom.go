@@ -56,7 +56,7 @@ func (b Bathroom) String() string {
 	for _, row := range tiles {
 		for _, cell := range row {
 			if cell == 0 {
-				builder.WriteString(".")
+				builder.WriteString(" ")
 			} else {
 				builder.WriteString(fmt.Sprintf("%d", cell))
 			}
