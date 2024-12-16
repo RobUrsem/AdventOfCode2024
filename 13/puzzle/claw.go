@@ -52,6 +52,10 @@ func isInteger(f float64) bool {
 	return math.Mod(f, 1) == 0 // Check if there's no remainder
 }
 
+func (game Game) CorrectPrizes() {
+	game.Prize[0] += 10000000000000
+	game.Prize[1] += 10000000000000
+}
 func (game Game) Cost() int {
 	/* Solve
 		Prize[0] = x A[0] + y B[0]

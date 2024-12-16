@@ -27,4 +27,14 @@ func main() {
 	}
 
 	fmt.Printf("Total cost for winning games: %v tokens\n", totalTokens)
+
+	totalTokens = 0
+	for _, game := range games {
+		game.CorrectPrizes()
+		cost := game.Cost()
+		if cost > 0 {
+			totalTokens += cost
+		}
+	}
+	fmt.Printf("Total cost for winning games after correction: %v tokens\n", totalTokens)
 }

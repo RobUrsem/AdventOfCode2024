@@ -1,6 +1,9 @@
 package puzzle
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestClawGame(t *testing.T) {
 	testCases := []struct {
@@ -78,6 +81,10 @@ func TestClawGame(t *testing.T) {
 			if cost != tc.cost {
 				t.Errorf("Expected cost of %v but got %v", tc.cost, cost)
 			}
+
+			games[0].CorrectPrizes()
+			cost = games[0].Cost()
+			fmt.Printf("Cost after correction: %v\n", cost)
 		})
 	}
 }
