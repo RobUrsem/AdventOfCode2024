@@ -16,12 +16,23 @@ func main() {
 		log.Fatalf("Error reading [%v]: %v", filePath, err)
 	}
 
-	grid := puzzle.ReadGrid(lines)
 	moves := puzzle.ReadMoves(lines)
+
+	//--- Part A
+	grid := puzzle.ReadGrid(lines)
 	grid.MoveRobot(moves)
 	gps := grid.CalculateGPS()
 
 	fmt.Printf("Final grid:\n")
 	fmt.Println(grid)
+	fmt.Printf("GPS Coordinates sum: %v\n", gps)
+
+	//--- Part B
+	widegrid := puzzle.MakeWideGrid(lines)
+	widegrid.MoveRobot(moves)
+	gps = widegrid.CalculateGPS()
+
+	fmt.Printf("Final grid:\n")
+	fmt.Println(widegrid)
 	fmt.Printf("GPS Coordinates sum: %v\n", gps)
 }
