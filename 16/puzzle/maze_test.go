@@ -1,6 +1,9 @@
 package puzzle
 
-import "testing"
+import (
+	"fmt"
+	"testing"
+)
 
 func TestMaze(t *testing.T) {
 	testCases := []struct {
@@ -54,10 +57,27 @@ func TestMaze(t *testing.T) {
 		},
 	}
 
+	// err := termbox.Init()
+	// if err != nil {
+	// 	fmt.Println(err)
+	// 	return
+	// }
+	// defer termbox.Close()
+
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			maze := MakeMaze(tc.input)
-			cost := maze.FindShortestPathLength()
+
+			// path := maze.AStarSolve()
+			// fmt.Printf("Path length: %v\n", len(path))
+			// _, cost := maze.SolveMaze()
+			path, cost := maze.SolveMaze()
+
+			for i, p := range path {
+				fmt.Printf("%3d: %v\n", i, p)
+			}
+
+			// cost := maze.FindShortestPathLength()
 			if cost != tc.expectedCost {
 				t.Errorf("Expected total to be %v, but got %v", tc.expectedCost, cost)
 			}
