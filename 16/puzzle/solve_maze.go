@@ -89,9 +89,9 @@ func (m *Maze) SolveMaze() ([]Point, int, int) {
 
 		if curPoint == goal {
 			BlockNonOptimalPaths(costs, curCost)
-			// PrintCosts(costs)
+			PrintCosts(costs)
 			numSeats := m.FindBestSeats(costs, Point{m.end[0], m.end[1]})
-			// m.Print()
+			m.Print()
 			// fmt.Printf("Num best seats: %v\n", numSeats)
 			return m.reconstructPath(costs), curCost, numSeats
 		}
@@ -209,9 +209,9 @@ func PrintCosts(costs [][]int) {
 	for _, line := range costs {
 		for _, cost := range line {
 			if cost == math.MaxInt {
-				fmt.Print("#,")
+				fmt.Print("#####,")
 			} else if cost < 0 {
-				fmt.Print("O,")
+				fmt.Print("  O  ,")
 			} else {
 				fmt.Printf("%5d,", cost)
 			}
