@@ -20,9 +20,10 @@ func main() {
 	maze := puzzle.MakeMaze(lines)
 
 	start := time.Now()
-	_, cost := maze.SolveMaze()
+	_, cost, numSeats := maze.SolveMaze()
 	elapsed := time.Since(start)
 
 	fmt.Printf("Cost: %v\n", cost)
+	fmt.Printf("Best seats: %v\n", numSeats)
 	fmt.Printf("Elapsed: %v\n", elapsed)
 }

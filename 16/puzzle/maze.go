@@ -1,7 +1,6 @@
 package puzzle
 
 import (
-	"advent/shared"
 	"fmt"
 )
 
@@ -14,6 +13,7 @@ const (
 	EAST  = '>'
 	SOUTH = 'v'
 	WEST  = '<'
+	BEST  = 'O'
 )
 
 const (
@@ -25,7 +25,6 @@ const (
 type Maze struct {
 	grid       []string
 	visited    [][]rune
-	moves      shared.Stack
 	start, end []int
 }
 
@@ -63,6 +62,7 @@ func (m Maze) Print() {
 					fmt.Print(" ")
 				}
 			}
+			fmt.Print(",")
 		}
 		fmt.Println()
 	}
