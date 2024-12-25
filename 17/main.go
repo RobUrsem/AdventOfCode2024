@@ -1,6 +1,7 @@
 package main
 
 import (
+	"17/puzzle"
 	"advent/shared"
 	"fmt"
 	"log"
@@ -15,5 +16,9 @@ func main() {
 		log.Fatalf("Error reading [%v]: %v", filePath, err)
 	}
 
-	fmt.Println(lines)
+	computer := puzzle.NewComputer(lines)
+	computer.Run()
+
+	output := computer.Output()
+	fmt.Printf("Output: [%v]\n", output)
 }

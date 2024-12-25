@@ -184,12 +184,7 @@ func (c *Computer) Run() {
 		c.Execute(c.Instructions[i], c.Instructions[i+1])
 
 		if c.Instructions[i] == JNZ && c.A != 0 {
-			fmt.Printf("Jumping to %v\n", c.Instructions[i+1])
 			i = c.Instructions[i+1] - 2
-			if i > len(c.Instructions) {
-				fmt.Println("Halt")
-				return
-			}
 		}
 	}
 }
