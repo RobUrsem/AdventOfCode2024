@@ -3,6 +3,7 @@ package puzzle
 import (
 	"fmt"
 	"testing"
+	"time"
 )
 
 func AreEqual(a, b Computer) bool {
@@ -16,12 +17,24 @@ func AreEqual(a, b Computer) bool {
 		return false
 	}
 
-	if len(a.output) != len(b.output) {
+	if len(a.Output) != len(b.Output) {
 		return false
 	}
 
-	for i := range a.output {
-		if a.output[i] != b.output[i] {
+	for i := range a.Output {
+		if a.Output[i] != b.Output[i] {
+			return false
+		}
+	}
+	return true
+}
+
+func AreEqualSlice(a, b []int) bool {
+	if len(a) != len(b) {
+		return false
+	}
+	for i := range a {
+		if a[i] != b[i] {
 			return false
 		}
 	}
@@ -47,7 +60,7 @@ func TestComputer(t *testing.T) {
 				A:      0,
 				B:      1,
 				C:      9,
-				output: []int{},
+				Output: []int{},
 			},
 		},
 		{
@@ -63,7 +76,7 @@ func TestComputer(t *testing.T) {
 				A:      10,
 				B:      0,
 				C:      0,
-				output: []int{0, 1, 2},
+				Output: []int{0, 1, 2},
 			},
 		},
 		{
@@ -79,7 +92,7 @@ func TestComputer(t *testing.T) {
 				A:      0,
 				B:      0,
 				C:      0,
-				output: []int{4, 2, 5, 6, 7, 7, 7, 7, 3, 1, 0},
+				Output: []int{4, 2, 5, 6, 7, 7, 7, 7, 3, 1, 0},
 			},
 		},
 		{
@@ -95,7 +108,7 @@ func TestComputer(t *testing.T) {
 				A:      0,
 				B:      0,
 				C:      0,
-				output: []int{4, 6, 3, 5, 6, 3, 5, 2, 1, 0},
+				Output: []int{4, 6, 3, 5, 6, 3, 5, 2, 1, 0},
 			},
 		},
 		{
@@ -111,7 +124,7 @@ func TestComputer(t *testing.T) {
 				A:      0,
 				B:      7,
 				C:      1,
-				output: []int{2, 7, 2, 5, 1, 2, 7, 3, 7},
+				Output: []int{2, 7, 2, 5, 1, 2, 7, 3, 7},
 			},
 		},
 	}
@@ -121,7 +134,7 @@ func TestComputer(t *testing.T) {
 			computer := NewComputer(tc.input)
 			computer.Run()
 
-			output := computer.Output()
+			output := computer.Print()
 			fmt.Printf("Output: [%v]\n", output)
 
 			if !AreEqual(computer, tc.expected) {
@@ -129,4 +142,73 @@ func TestComputer(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestReverseComputerFull(t *testing.T) {
+	testCases := []struct {
+		name     string
+		input    []string
+		expected int
+	}{
+		{
+			"ex 1",
+			[]string{
+				"Register A: 2024",
+				"Register B: 0",
+				"Register C: 0",
+				"",
+				"Program: 0,3,5,4,3,0",
+			},
+			117440,
+		},
+		{
+			"Full",
+			[]string{
+				"Register A: 25358015",
+				"Register B: 0",
+				"Register C: 0",
+				"",
+				"Program: 2,4, 1,1, 7,5, 0,3, 4,7, 1,6, 5,5, 3,0",
+			},
+			247839002892474,
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			computer := NewComputer(tc.input)
+
+			begin := time.Now()
+			computer.RunReverse()
+			elapsed := time.Since(begin)
+
+			fmt.Printf("Value of register A: %v\n", computer.CorrectedA)
+			fmt.Printf("Elapsed: %v\n", elapsed)
+
+			if computer.CorrectedA != tc.expected {
+				t.Errorf("Incorrect: got %v but expected %v", computer.CorrectedA, tc.expected)
+			}
+		})
+	}
+}
+
+func TestSingle(t *testing.T) {
+	input := []string{
+		"Register A: 5",
+		"Register B: 0",
+		"Register C: 0",
+		"",
+		"Program: 2,4, 1,1, 7,5, 0,3, 4,7, 1,6, 5,5, 3,0",
+	}
+
+	computer := NewComputer(input)
+	options := []int{
+		247839002892474,
+	}
+	for i := range options {
+		computer.Reset(options[i], 0, 0)
+		computer.Run()
+		fmt.Printf("%d -> %v\n", options[i], computer.Print())
+	}
+
 }

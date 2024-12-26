@@ -21,7 +21,9 @@ const (
 type Computer struct {
 	A, B, C      int // register
 	Instructions []int
-	output       []int
+	Output       []int
+	CorrectedA   int
+	Expected     string
 }
 
 func parseRegisters(regStr string) (int, error) {
@@ -60,6 +62,7 @@ func NewComputer(input []string) Computer {
 		B:            b,
 		C:            c,
 		Instructions: instructions,
+		CorrectedA:   math.MaxInt,
 	}
 	return computer
 }
@@ -90,8 +93,8 @@ func (c *Computer) Combo(input int) int {
 	return 0
 }
 
-func (c *Computer) division(input int) int {
-	return int(float64(c.A) / math.Pow(2, float64(c.Combo(input))))
+func (c *Computer) shr(input int) int {
+	return c.A >> c.Combo(input)
 }
 
 /*
@@ -101,7 +104,23 @@ operand of 2 would divide A by 4 (2^2); an operand of 5 would divide A by 2^B.) 
 the division operation is truncated to an integer and then written to the A register.
 */
 func (c *Computer) Adv(input int) {
-	c.A = c.division(input)
+	c.A = c.shr(input)
+}
+
+/*
+The bdv instruction (opcode 6) works exactly like the adv instruction except that
+the result is stored in the B register. (The numerator is still read from the A register.)
+*/
+func (c *Computer) Bdv(input int) {
+	c.B = c.shr(input)
+}
+
+/*
+The cdv instruction (opcode 7) works exactly like the adv instruction except that
+the result is stored in the C register. (The numerator is still read from the A register.)
+*/
+func (c *Computer) Cdv(input int) {
+	c.C = c.shr(input)
 }
 
 /*
@@ -145,55 +164,119 @@ then outputs that value. (If a program outputs multiple values, they are separat
 by commas.)
 */
 func (c *Computer) Out(input int) {
-	c.output = append(c.output, c.Combo(input)%8)
+	c.Output = append(c.Output, c.Combo(input)%8)
 }
 
-/*
-The bdv instruction (opcode 6) works exactly like the adv instruction except that
-the result is stored in the B register. (The numerator is still read from the A register.)
-*/
-func (c *Computer) Bdv(input int) {
-	c.B = c.division(input)
-}
-
-func (c *Computer) Cdv(input int) {
-	c.C = c.division(input)
-}
-
-func (c *Computer) Execute(a, b int) {
-	switch a {
+func (c *Computer) Execute(op, arg int) {
+	switch op {
 	case ADV:
-		c.Adv(b)
+		c.Adv(arg)
 	case BXL:
-		c.Bxl(b)
+		c.Bxl(arg)
 	case BST:
-		c.Bst(b)
+		c.Bst(arg)
 	case BXC:
-		c.Bxc(b)
+		c.Bxc(arg)
 	case OUT:
-		c.Out(b)
+		c.Out(arg)
 	case BDV:
-		c.Bdv(b)
+		c.Bdv(arg)
 	case CDV:
-		c.Cdv(b)
+		c.Cdv(arg)
 	}
 }
 
-func (c *Computer) Run() {
-	for i := 0; i < len(c.Instructions); i += 2 {
-		c.Execute(c.Instructions[i], c.Instructions[i+1])
+func (c *Computer) Run() string {
+	c.Output = []int{}
 
-		if c.Instructions[i] == JNZ && c.A != 0 {
-			i = c.Instructions[i+1] - 2
+	for i := 0; i < len(c.Instructions); i += 2 {
+		op := c.Instructions[i]
+		arg := c.Instructions[i+1]
+		c.Execute(op, arg)
+
+		if op == JNZ && c.A != 0 {
+			i = arg - 2
+		}
+	}
+
+	return c.Print()
+}
+
+func (c *Computer) Reset(regA, regB, regC int) {
+	c.A = regA
+	c.B = regB
+	c.C = regC
+	c.Output = []int{}
+}
+
+/*
+-----------------------------------------------
+Our program:
+1: 2,4, B = A & 7
+2: 1,1, B = B ^ 1
+3: 7,5, C = A >> B
+4: 0,3, A = A >> 3
+5: 4,7, B = B ^ C
+6: 1,6, B = B ^ 6
+7: 5,5, print B
+8: 3,0, if A == 0 then halt else goto start
+
+Note that in instruction 4 we shift A by 3 bits
+thus dividing by 8. We only need to look at 3 bits
+at a time to get the next numbers.
+
+To get the pattern that gets us the output that is
+equal to that of the input instructions, we should
+start at the end, and play with the last three bits
+of the number. Once we found a suitable candidate
+we take that, multiply it by 8 bits (<< 3) and try
+for the next output number until we have found all.
+
+Since there might be multiple solutions (modulo 8)
+we need to take the lowest number.
+------------------------------------------------
+*/
+func (c *Computer) RunReverse() {
+	// Start at the end
+	index := len(c.Instructions) - 1
+
+	// Convert the instructions to a single string
+	strSlice := make([]string, len(c.Instructions))
+	for i, num := range c.Instructions {
+		strSlice[i] = strconv.Itoa(num)
+	}
+	c.Expected = strings.Join(strSlice, "")
+
+	// Let's go
+	c.solve(0, index)
+}
+
+func (c *Computer) solve(currentA int, index int) {
+	if index == -1 {
+		c.CorrectedA = min(c.CorrectedA, currentA)
+		return
+	}
+
+	// get the last (length - index) characters
+	expected := c.Expected[index:]
+	for remainder := 0; remainder < 8; remainder++ {
+		nextA := currentA*8 + remainder
+
+		c.Reset(nextA, 0, 0)
+		output := c.Run()
+
+		if output == expected {
+			// get to the next number
+			c.solve(nextA, index-1)
 		}
 	}
 }
 
-func (c Computer) Output() string {
-	strSlice := make([]string, len(c.output))
-	for i, num := range c.output {
+func (c Computer) Print() string {
+	strSlice := make([]string, len(c.Output))
+	for i, num := range c.Output {
 		strSlice[i] = strconv.Itoa(num)
 	}
 
-	return strings.Join(strSlice, ",")
+	return strings.Join(strSlice, "")
 }
