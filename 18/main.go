@@ -20,6 +20,7 @@ func main() {
 	mem := puzzle.MakeMemory(71, 71)
 	mem.LoadBytes(lines)
 
+	// Part A
 	start := time.Now()
 	mem.Simulate(1024)
 	_, cost := mem.SolveMaze()
@@ -27,4 +28,18 @@ func main() {
 	mem.Print()
 	fmt.Printf("Cost to the maze: %v\n", cost)
 	fmt.Printf("Elapsed: %v\n", elapsed)
+
+	// Part B
+	start = time.Now()
+	for {
+		mem.NextByte()
+		_, cost = mem.SolveMaze()
+		if cost < 0 {
+			elapsed = time.Since(start)
+			loc := mem.LastFallenByte()
+			fmt.Printf("Solve impossible after falling of block %v,%v\n", loc.C, loc.R)
+			fmt.Printf("Elapsed: %v\n", elapsed)
+			break
+		}
+	}
 }

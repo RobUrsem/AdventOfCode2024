@@ -41,6 +41,7 @@ type Memory struct {
 	grid       [][]rune
 	bytes      []Location
 	start, end Location
+	fallen     int
 }
 
 func MakeMemory(width, height int) Memory {
@@ -72,9 +73,20 @@ func (m *Memory) Simulate(numSteps int) {
 	m.Reset()
 	steps := min(numSteps, len(m.bytes))
 	for step := 0; step < steps; step++ {
-		loc := m.bytes[step]
-		m.grid[loc.R][loc.C] = WALL
+		m.NextByte()
 	}
+}
+
+func (m *Memory) NextByte() {
+	if m.fallen < len(m.bytes) {
+		loc := m.bytes[m.fallen]
+		m.grid[loc.R][loc.C] = WALL
+		m.fallen++
+	}
+}
+
+func (m Memory) LastFallenByte() Location {
+	return m.bytes[m.fallen-1]
 }
 
 func (m *Memory) Print() {

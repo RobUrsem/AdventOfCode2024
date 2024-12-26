@@ -50,6 +50,15 @@ func TestMemory(t *testing.T) {
 			_, cost := mem.SolveMaze()
 			mem.Print()
 			fmt.Printf("Cost to the maze: %v\n", cost)
+
+			for step := 13; step < len(mem.bytes); step++ {
+				mem.NextByte()
+				_, cost = mem.SolveMaze()
+				if cost < 0 {
+					fmt.Printf("Solve impossible at step %v last block %v\n", step, mem.bytes[step-1])
+					break
+				}
+			}
 		})
 	}
 }
