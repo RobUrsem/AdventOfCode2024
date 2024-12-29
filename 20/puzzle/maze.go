@@ -21,11 +21,6 @@ type Location struct {
 	R, C int
 }
 
-type Cheat struct {
-	a     Location
-	costs [][]int
-}
-
 func Combine(a, b Location) Location {
 	return Location{a.R + b.R, a.C + b.C}
 }
@@ -35,7 +30,6 @@ type Maze struct {
 	visited    [][]rune
 	costs      [][]int
 	start, end Location
-	cheat      Cheat
 }
 
 func MakeMaze(lines []string) Maze {
