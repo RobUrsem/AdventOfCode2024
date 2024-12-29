@@ -47,7 +47,7 @@ func (pq *PriorityQueue) Pop() interface{} {
 func (m Maze) isSafe(p Location) bool {
 	return p.R >= 0 && p.R < len(m.grid) &&
 		p.C >= 0 && p.C < len(m.grid[0]) &&
-		(m.grid[p.R][p.C] != WALL || m.isCheat(p)) &&
+		m.grid[p.R][p.C] != WALL &&
 		m.visited[p.R][p.C] == NOPE
 }
 
@@ -68,14 +68,10 @@ func (m Maze) GetCheatLocations() []Location {
 func (m *Maze) Part1(minSaving int) int {
 	numCheats := 0
 
-	basecost := m.SolveMaze()
+	m.SolveMaze()
 	cheats := m.GetCheatLocations()
 	for _, cheat := range cheats {
-		m.AddCheat(cheat)
-		cost := m.SolveMaze()
-		m.RemoveCheat()
-
-		saving := basecost - cost
+		saving := m.AddCheat(cheat)
 		if saving >= minSaving {
 			numCheats++
 		}

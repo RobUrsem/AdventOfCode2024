@@ -47,11 +47,7 @@ func TestMaze(t *testing.T) {
 			counts := map[int][]Location{}
 			cheats := maze.GetCheatLocations()
 			for _, cheat := range cheats {
-				maze.AddCheat(cheat)
-				cost := maze.SolveMaze()
-				maze.RemoveCheat()
-
-				saving := basecost - cost
+				saving := maze.AddCheat(cheat)
 				counts[saving] = append(counts[saving], cheat)
 			}
 

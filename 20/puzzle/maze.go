@@ -2,6 +2,7 @@ package puzzle
 
 import (
 	"fmt"
+	"math"
 )
 
 const (
@@ -63,37 +64,31 @@ func (m Maze) withinWalls(loc Location) bool {
 		loc.C > 0 && loc.C < len(m.grid[0])
 }
 
-func copy(a [][]int) [][]int {
-	b := make([][]int, len(a))
-	for i, line := range a {
-		b[i] = make([]int, len(line))
-		for j, v := range line {
-			b[i][j] = v
+func (m *Maze) AddCheat(loc Location) int {
+	if !m.withinWalls(loc) {
+		return 0
+	}
+
+	minCost := math.MaxInt
+	maxCost := 0
+	for dir := 0; dir < 4; dir++ {
+		l := Combine(loc, directions[dir])
+		if m.withinWalls(l) {
+			cost := m.costs[l.R][l.C]
+			if cost != math.MaxInt {
+				minCost = min(minCost, cost)
+				maxCost = max(maxCost, cost)
+			}
 		}
 	}
-	return b
-}
 
-func (m *Maze) AddCheat(loc Location) bool {
-	if !m.withinWalls(loc) {
-		return false
+	const COST_OF_CHEAT = 2
+	gain := maxCost - minCost - COST_OF_CHEAT
+	if gain < 0 || gain == math.MaxInt {
+		return 0
 	}
-	m.cheat.a = loc
-	m.cheat.costs = copy(m.costs)
 
-	return true
-}
-
-func (m *Maze) RemoveCheat() {
-	m.costs = copy(m.cheat.costs)
-	m.cheat = Cheat{}
-}
-
-func (m *Maze) isCheat(l Location) bool {
-	if l.R == m.cheat.a.R && l.C == m.cheat.a.C {
-		return true
-	}
-	return false
+	return gain
 }
 
 func (m Maze) Print() {
