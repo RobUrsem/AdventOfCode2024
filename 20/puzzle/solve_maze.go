@@ -47,24 +47,57 @@ func (pq *PriorityQueue) Pop() interface{} {
 func (m Maze) isSafe(p Location) bool {
 	return p.R >= 0 && p.R < len(m.grid) &&
 		p.C >= 0 && p.C < len(m.grid[0]) &&
-		m.grid[p.R][p.C] != WALL && m.visited[p.R][p.C] == NOPE
+		(m.grid[p.R][p.C] != WALL || m.isCheat(p)) &&
+		m.visited[p.R][p.C] == NOPE
+}
+
+func (m Maze) GetCheatLocations() []Location {
+	locations := []Location{}
+	for r, line := range m.grid {
+		for c, char := range line {
+			if r > 0 && r < len(m.grid) &&
+				c > 0 && c < len(m.grid[0]) &&
+				char == WALL {
+				locations = append(locations, Location{r, c})
+			}
+		}
+	}
+	return locations
+}
+
+func (m *Maze) Part1(minSaving int) int {
+	numCheats := 0
+
+	basecost := m.SolveMaze()
+	cheats := m.GetCheatLocations()
+	for _, cheat := range cheats {
+		m.AddCheat(cheat)
+		cost := m.SolveMaze()
+		m.RemoveCheat()
+
+		saving := basecost - cost
+		if saving >= minSaving {
+			numCheats++
+		}
+	}
+	return numCheats
 }
 
 // Directions: up, right, down, left
 var directions = []Location{{-1, 0}, {0, 1}, {1, 0}, {0, -1}}
 
-func (m *Maze) SolveMaze() ([]Location, int) {
+func (m *Maze) SolveMaze() int {
 	start := m.start
 	goal := m.end
 
 	numRows, numCols := len(m.grid), len(m.grid[0])
 	m.visited = make([][]rune, numRows)
-	costs := make([][]int, numRows)
-	for i := range costs {
-		costs[i] = make([]int, numCols)
+	m.costs = make([][]int, numRows)
+	for i := range m.costs {
+		m.costs[i] = make([]int, numCols)
 		m.visited[i] = make([]rune, numCols)
-		for j := range costs[i] {
-			costs[i][j] = math.MaxInt
+		for j := range m.costs[i] {
+			m.costs[i][j] = math.MaxInt
 		}
 	}
 
@@ -75,7 +108,7 @@ func (m *Maze) SolveMaze() ([]Location, int) {
 	for dir := 0; dir < 4; dir++ {
 		startNode := &Node{Location: start, cost: 0, direction: dir}
 		heap.Push(pq, startNode)
-		costs[start.R][start.C] = 0
+		m.costs[start.R][start.C] = 0
 	}
 
 	for pq.Len() > 0 {
@@ -83,10 +116,7 @@ func (m *Maze) SolveMaze() ([]Location, int) {
 		curLocation, curCost := current.Location, current.cost
 
 		if curLocation == goal {
-			// BlockNonOptimalPaths(costs, curCost)
-			// PrintCosts(costs)
-			// m.Print()
-			return m.reconstructPath(costs), curCost
+			return curCost
 		}
 
 		// Explore neighbors
@@ -97,17 +127,17 @@ func (m *Maze) SolveMaze() ([]Location, int) {
 			}
 
 			newCost := curCost + 1
-			if newCost < costs[newLocation.R][newLocation.C] {
-				costs[newLocation.R][newLocation.C] = newCost
+			if newCost < m.costs[newLocation.R][newLocation.C] {
+				m.costs[newLocation.R][newLocation.C] = newCost
 				heap.Push(pq, &Node{Location: newLocation, cost: newCost, direction: newDir})
 			}
 		}
 	}
 
-	return nil, -1 // No path found
+	return -1 // No path found
 }
 
-func (m *Maze) reconstructPath(costs [][]int) []Location {
+func (m *Maze) ReconstructPath(costs [][]int) []Location {
 	end := m.end
 	path := []Location{}
 

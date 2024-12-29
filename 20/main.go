@@ -19,9 +19,16 @@ func main() {
 
 	start := time.Now()
 	maze := puzzle.MakeMaze(lines)
-	_, steps := maze.SolveMaze()
+	steps := maze.SolveMaze()
 	elapsed := time.Since(start)
 
 	fmt.Printf("Steps to solve the maze: %v\n", steps)
+	fmt.Printf("Elapsed: %v\n", elapsed)
+
+	start = time.Now()
+	numCheats := maze.Part1(100)
+	elapsed = time.Since(start)
+
+	fmt.Printf("Num cheats with >= 100 saving: %v\n", numCheats)
 	fmt.Printf("Elapsed: %v\n", elapsed)
 }

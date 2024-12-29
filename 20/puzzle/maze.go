@@ -20,6 +20,11 @@ type Location struct {
 	R, C int
 }
 
+type Cheat struct {
+	a     Location
+	costs [][]int
+}
+
 func Combine(a, b Location) Location {
 	return Location{a.R + b.R, a.C + b.C}
 }
@@ -27,7 +32,9 @@ func Combine(a, b Location) Location {
 type Maze struct {
 	grid       []string
 	visited    [][]rune
+	costs      [][]int
 	start, end Location
+	cheat      Cheat
 }
 
 func MakeMaze(lines []string) Maze {
@@ -49,6 +56,44 @@ func MakeMaze(lines []string) Maze {
 	}
 
 	return maze
+}
+
+func (m Maze) withinWalls(loc Location) bool {
+	return loc.R > 0 && loc.R < len(m.grid) &&
+		loc.C > 0 && loc.C < len(m.grid[0])
+}
+
+func copy(a [][]int) [][]int {
+	b := make([][]int, len(a))
+	for i, line := range a {
+		b[i] = make([]int, len(line))
+		for j, v := range line {
+			b[i][j] = v
+		}
+	}
+	return b
+}
+
+func (m *Maze) AddCheat(loc Location) bool {
+	if !m.withinWalls(loc) {
+		return false
+	}
+	m.cheat.a = loc
+	m.cheat.costs = copy(m.costs)
+
+	return true
+}
+
+func (m *Maze) RemoveCheat() {
+	m.costs = copy(m.cheat.costs)
+	m.cheat = Cheat{}
+}
+
+func (m *Maze) isCheat(l Location) bool {
+	if l.R == m.cheat.a.R && l.C == m.cheat.a.C {
+		return true
+	}
+	return false
 }
 
 func (m Maze) Print() {
