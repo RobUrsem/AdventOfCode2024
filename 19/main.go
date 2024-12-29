@@ -18,10 +18,13 @@ func main() {
 	}
 
 	start := time.Now()
-	onsen := puzzle.ReadPatterns(lines)
-	numPossible := onsen.FindPossible()
+	towels := puzzle.MakeTowels(lines)
+	numPossible := towels.Part1()
+	numWays := towels.Part2()
 	elapsed := time.Since(start)
+	fmt.Printf("Elapsed: %v\n", elapsed)
 
 	fmt.Printf("Found %v possible patterns\n", numPossible)
+	fmt.Printf("Found %v total ways\n", numWays)
 	fmt.Printf("Elapsed: %v\n", elapsed)
 }
