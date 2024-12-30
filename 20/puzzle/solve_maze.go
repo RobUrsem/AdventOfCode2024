@@ -4,6 +4,7 @@ import (
 	"container/heap"
 	"fmt"
 	"math"
+	"sort"
 )
 
 const (
@@ -65,6 +66,20 @@ func (m Maze) GetCheatLocations() []Location {
 	return locations
 }
 
+func (m Maze) GetLongCheatLocations() []Location {
+	locations := []Location{}
+	for r, line := range m.grid {
+		for c, char := range line {
+			if r > 0 && r < len(m.grid) &&
+				c > 0 && c < len(m.grid[0]) &&
+				char != WALL {
+				locations = append(locations, Location{r, c})
+			}
+		}
+	}
+	return locations
+}
+
 func (m *Maze) Part1(minSaving int) int {
 	numCheats := 0
 
@@ -76,6 +91,41 @@ func (m *Maze) Part1(minSaving int) int {
 			numCheats++
 		}
 	}
+	return numCheats
+}
+
+func sortedKeys(m map[int]int) []int {
+	keys := make([]int, 0, len(m))
+	for k := range m {
+		keys = append(keys, k)
+	}
+
+	// Sort the keys
+	sort.Ints(keys)
+	return keys
+}
+
+func (m *Maze) Part2(minSaving int) int {
+	m.SolveMaze()
+	cheats := m.GetLongCheatLocations()
+	results := map[string]int{}
+	for _, cheat := range cheats {
+		m.AddLongerCheat(cheat, results)
+	}
+
+	cheatsByLength := map[int]int{}
+	for _, v := range results {
+		cheatsByLength[v]++
+	}
+
+	numCheats := 0
+	for _, k := range sortedKeys(cheatsByLength) {
+		if k >= minSaving {
+			// fmt.Printf("%6d cheats that save %4d steps\n", cheatsByLength[k], k)
+			numCheats += cheatsByLength[k]
+		}
+	}
+
 	return numCheats
 }
 

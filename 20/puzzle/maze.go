@@ -85,6 +85,58 @@ func (m *Maze) AddCheat(loc Location) int {
 	return gain
 }
 
+func locKey(a, b Location) string {
+	// if a.R < b.R && a.C < b.C {
+	// 	return fmt.Sprintf("%v->%v", a, b)
+	// }
+	return fmt.Sprintf("%v->%v", a, b)
+}
+func Distance(a, b Location) int {
+	dr := a.R - b.R
+	dc := a.C - b.C
+	if dr < 0 {
+		dr = -dr
+	}
+	if dc < 0 {
+		dc = -dc
+	}
+	return dr + dc
+}
+func Abs(x int) int {
+	if x < 0 {
+		return -x
+	}
+	return x
+}
+
+func (m Maze) AddLongerCheat(loc Location, result map[string]int) {
+	if !m.withinWalls(loc) {
+		return
+	}
+
+	// Get cost before this cheat starts
+	startLoc := loc
+	startCost := m.costs[loc.R][loc.C]
+
+	maxDistance := 20
+	for dr := -maxDistance; dr <= maxDistance; dr++ {
+		max_c := maxDistance - Abs(dr)
+		for dc := -max_c; dc <= max_c; dc++ {
+			l := Combine(startLoc, Location{dr, dc})
+			if m.withinWalls(l) {
+				cost := m.costs[l.R][l.C]
+				if cost != math.MaxInt && cost > startCost {
+					costOfCheat := Distance(startLoc, l)
+					gain := cost - startCost - costOfCheat
+					if gain > 0 {
+						result[locKey(startLoc, l)] = gain
+					}
+				}
+			}
+		}
+	}
+}
+
 func (m Maze) Print() {
 	for r, line := range m.grid {
 		for c, char := range line {

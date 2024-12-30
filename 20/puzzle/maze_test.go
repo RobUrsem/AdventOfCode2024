@@ -64,7 +64,68 @@ func TestMaze(t *testing.T) {
 				}
 				fmt.Printf("%2d steps: %2d cheats\n", k, len(counts[k]))
 			}
+		})
+	}
+}
+func TestLongCheat(t *testing.T) {
+	testCases := []struct {
+		name         string
+		input        []string
+		expectedCost int
+		cheats       map[int]int
+	}{
+		{
+			name: "1",
+			input: []string{
+				"###############",
+				"#...#...#.....#",
+				"#.#.#.#.#.###.#",
+				"#S#...#.#.#...#",
+				"#######.#.#.###",
+				"#######.#.#...#",
+				"#######.#.###.#",
+				"###..E#...#...#",
+				"###.#######.###",
+				"#...###...#...#",
+				"#.#####.#.###.#",
+				"#.#...#.#.#...#",
+				"#.#.#.#.#.#.###",
+				"#...#...#...###",
+				"###############",
+			},
+			expectedCost: 84,
+			cheats: map[int]int{
+				50: 32,
+				52: 31,
+				54: 29,
+				56: 39,
+				58: 25,
+				60: 23,
+				62: 20,
+				64: 19,
+				66: 12,
+				68: 14,
+				70: 12,
+				72: 22,
+				74: 4,
+				76: 3,
+			},
+		},
+	}
 
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			maze := MakeMaze(tc.input)
+			numCheats := maze.Part2(50)
+
+			expected := 0
+			for _, v := range tc.cheats {
+				expected += v
+			}
+
+			if numCheats != expected {
+				t.Errorf("Expected %v cheats but got %v", expected, numCheats)
+			}
 		})
 	}
 }

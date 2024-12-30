@@ -31,4 +31,11 @@ func main() {
 
 	fmt.Printf("Num cheats with >= 100 saving: %v\n", numCheats)
 	fmt.Printf("Elapsed: %v\n", elapsed)
+
+	start = time.Now()
+	numCheats = maze.Part2(100)
+	elapsed = time.Since(start)
+
+	fmt.Printf("Num long cheats with >= 100 saving: %v\n", numCheats)
+	fmt.Printf("Elapsed: %v\n", elapsed)
 }
